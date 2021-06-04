@@ -3,7 +3,7 @@ Projet codé en C
 
 Compresse ou décompresse des fichiers en utilisant le codage Huffman
 
-## AUTEURS
+## AUTEUR
 Robin MENEUST
 
 ## INSTALLATION
