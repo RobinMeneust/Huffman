@@ -181,7 +181,7 @@ void decompressMain(char* fileNameIn)
 
     indexBW=readNumberLine(fileTable, 0);
 
-    printf("\nDecompression du file selon la table...\n");
+    printf("\nDecompression...\n");
     FileBuffer buffertext;
     decompress(fileIn, &buffertext, fileTable);
     FCLOSE(fileIn);

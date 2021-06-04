@@ -254,7 +254,6 @@ void saveTable(int indexBW, HuffmanTableCell* huffmanTable,int sizeHuffmanTable,
     for(int i=0; i<sizeHuffmanTable; i++){
         l = huffmanTable[i].code;
         fputc(huffmanTable[i].c, fileTable);
-        printf("TEST : i:%d     c   %c:%d\n", i, huffmanTable[i].c, huffmanTable[i].c);
         while(l!=NULL){
             fputc(l->value, fileTable);
             l = l->next;
