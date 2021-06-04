@@ -1,40 +1,40 @@
 /**
  * \file Compression.c
- * \brief Compresse le fichier donne par l'utilisateur en utilisant la table de codage table.txt precedemment creee.
+ * \brief Compresse le file donne par l'utilisateur en utilisant la table de codage table.txt precedemment creee.
  * \author Robin Meneust
- * \date 4 juin 2021
- */
+ * \date 2021
+*/
 
 #include "../include/Structures_Define.h"
 #include "../include/FonctionsHuffman.h"
 
 
 /**
- * \fn void compresser(FileBuffer bufferBW, FILE* fichierSortie)
- * \brief Compresse le fichierEntree a partir de la table generee
- * \param bufferBW Texte initial a compresser
- * \param fichierSortie Fichier compresse genere par cette fonction
- */
+ * \fn void compress(FileBuffer bufferBW, FILE* fileOut)
+ * \brief Compresse le fileIn a partir de la table generee
+ * \param bufferBW text initial a compress
+ * \param fileOut file compresse genere par cette fonction
+*/
 
-void compresser(FileBuffer bufferBW, FILE* fichierSortie)
+void compress(FileBuffer bufferBW, FILE* fileOut)
 {
-    uint8_t buffer=0;   // contient les bits en attendant qu'il soit plein, c'est a dire avant d'avoir 8bits a inserer dans le fichier
+    uint8_t buffer=0;   // contient les bits en attendant qu'il soit plein, c'est a dire avant d'avoir 8bits a inserer dans le file
     int remplissage=0;
-    int avancement=0;
+    int progress=0;
     unsigned char c, c_table;
     FILE* table = fopen("table.txt", "rb");
     TESTFOPEN(table);
-    rewind(fichierSortie);
+    rewind(fileOut);
     int pos=0;
-    while(pos<bufferBW.taille){
-        c = bufferBW.texte[pos];
+    while(pos<bufferBW.size){
+        c = bufferBW.text[pos];
         rewind(table);
-        retourLigneFichier(table);
-        retourLigneFichier(table);
-        retourLigneFichier(table);
+        wordWrapFile(table);
+        wordWrapFile(table);
+        wordWrapFile(table);
         c_table = fgetc(table);
         while(c_table!=c && !feof(table)){
-            retourLigneFichier(table);
+            wordWrapFile(table);
             c_table = fgetc(table);
         }
         if(c_table!=c){
@@ -49,8 +49,8 @@ void compresser(FileBuffer bufferBW, FILE* fichierSortie)
                 case '1': buffer <<= 1; buffer|=0b1; break; //On decale les bits vers la gauche puis on ajoute le bit (ici 1) tout a droite en utilisant un "ou" (car 100 << 1 donne 1000 et on fait un "ou" (avec le masque 00000001) ce qui donne 1001)
             }
             remplissage++;
-            if(remplissage==8){ //Le buffer est plein on peut inserer dans le fichier
-                putc(buffer, fichierSortie);
+            if(remplissage==8){ //Le buffer est plein on peut inserer dans le file
+                putc(buffer, fileOut);
                 buffer=0;
                 remplissage=0;
             }
@@ -58,10 +58,10 @@ void compresser(FileBuffer bufferBW, FILE* fichierSortie)
         }
         pos++;
 
-        if(avancement+5<((pos+1)*100)/bufferBW.taille)
+        if(progress+5<((pos+1)*100)/bufferBW.size)
         {
-            avancement=(int)((((pos+1)*100)/bufferBW.taille)/5)*5; //Affiche l'etat d'anvancement de la tache
-            printf("%d%%\n", avancement);
+            progress=(int)((((pos+1)*100)/bufferBW.size)/5)*5; //Affiche l'etat d'anvancement de la tache
+            printf("%d%%\n", progress);
         }
 
     }
@@ -70,7 +70,7 @@ void compresser(FileBuffer bufferBW, FILE* fichierSortie)
             buffer <<= 1;
             remplissage++;
         }
-        putc(buffer, fichierSortie);
+        putc(buffer, fileOut);
         buffer=0;
         remplissage=0;
     }
@@ -79,50 +79,50 @@ void compresser(FileBuffer bufferBW, FILE* fichierSortie)
 
 
 /**
- * \fn void compresserMain(char* nomFichierEntree)
- * \brief Fonction principale pour la compression : appelle les fonctions necessaires a la compression du fichier dont le nom est en parametre
- * \param nomFichierEntree Nom du fichier a compresser
- */
+ * \fn void compressMain(char* fileNameIn)
+ * \brief Fonction principale pour la compression : appelle les fonctions necessaires a la compression du file dont le nom est en parametre
+ * \param fileNameIn Nom du file a compress
+*/
 
-void compresserMain(char* nomFichierEntree)
+void compressMain(char* fileNameIn)
 {
-    FILE* fichierEntree;
-    FILE* fichierSortie;
-    long tailleFichierEntree;
-    int indiceBW=-1;
+    FILE* fileIn;
+    FILE* fileOut;
+    long fileSizeEntree;
+    int indexBW=-1;
 
-    fichierEntree = fopen(nomFichierEntree, "rb");
-    TESTFOPEN(fichierEntree);
-    tailleFichierEntree = chercherTaille(fichierEntree);
+    fileIn = fopen(fileNameIn, "rb");
+    TESTFOPEN(fileIn);
+    fileSizeEntree = seekSizeOfFile(fileIn);
     unsigned char option=0;
-    if(tailleFichierEntree<1000)
+    if(fileSizeEntree<1000)
     {
         option=1;
     }
 
-    FileBuffer bufferTexte=chargerDansBuffer(fichierEntree);
-    FCLOSE(fichierEntree);
+    FileBuffer buffertext=fileToBuffer(fileIn);
+    FCLOSE(fileIn);
 
     if(option==1)
     {
         //BURROWS WHEELER
         printf("\nApplication de Burrows Wheeler...\n");
-        indiceBW = burrowsWheeler(&bufferTexte);
+        indexBW = burrowsWheeler(&buffertext);
         
         // MTF
         printf("\nApplication du Move To Front...\n");
-        moveToFrontEncode(&bufferTexte);
+        moveToFrontEncode(&buffertext);
     } 
 
     //CREATION TABLE
-    creerTableHuffman(indiceBW, bufferTexte, option+'0');
+    createHuffmanTable(indexBW, buffertext, option+'0');
 
     //COMPRESSION
-    fichierSortie = fopen(strncat(nomFichierEntree, ".bin", 4), "wb+");
-    TESTFOPEN(fichierSortie);
-    printf("\nCompression du fichier...\n");
-    compresser(bufferTexte, fichierSortie);
+    fileOut = fopen(strncat(fileNameIn, ".bin", 4), "wb+");
+    TESTFOPEN(fileOut);
+    printf("\nCompression du file...\n");
+    compress(buffertext, fileOut);
     printf("\nFin de la compression\n");
-    FCLOSE(fichierSortie);
-    free(bufferTexte.texte);
+    FCLOSE(fileOut);
+    free(buffertext.text);
 }

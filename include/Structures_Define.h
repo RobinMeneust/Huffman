@@ -1,23 +1,22 @@
 /**
  * \file Structures_Define.h
- * \brief Contient les inclusion de librairie, les constantes, les macros et les structures du projet
+ * \brief Contains library includes, constants, macros and project structures
  * \author Robin Meneust
- * \date 4 juin 2021
- */
+ * \date 2021
+*/
 
 
 #ifndef StructuresDefine
 #define StructuresDefine
 
-//Inclusion des entete de libraire
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-//Entete de libraire pour le type uint8_t pour Compression.c et Decompression.c
+//For uint8_t in Compression.c and Decompression.c
 #include <inttypes.h>
 
-//Entete de libraire pour la fonction access utilisee dans DecompressionMain
+//For the access function used in DecompressionMain
 #if __linux__
 #include <unistd.h>
 #endif
@@ -25,90 +24,88 @@
 #include <io.h>
 #endif
 
-
-
-//Definition de constantes
+//Constants definitions
 
 /**
- * \def N_ASCII Constante correpondant au nombre de valeurs possibles prises par un octet
- */
+ * \def N_ASCII Constant correponding to the number of possible values taken by a byte
+*/
 
 #define N_ASCII 256
 
 /**
- * \def FCLOSE(X) Macro verifiant la fermeture d'un fichier, si elle n'a pas fonctionne on arrete le programme
- */
+ * \def FCLOSE(X) Macro used to check if a file was closed correctly, if not then the program is stopped
+*/
 
 #define FCLOSE(X){\
             if(fclose(X)==EOF){\
-                fprintf(stderr, "ERREUR : Fermeture du fichier impossible"); \
+                fprintf(stderr, "ERROR : Cannot close the file"); \
                 exit(EXIT_FAILURE); \
             }\
 }
 
 /**
- * \def TESTFOPEN(X) Macro verifiant l'ouverture d'un fichier, si elle n'a pas fonctionne on arrete le programme
- */
+ * \def TESTFOPEN(X) MMacro used to check if a file was opened correctly, if not then the program is stopped
+*/
 
 #define TESTFOPEN(X){\
             if(X==NULL){\
-                fprintf(stderr, "ERREUR : Ouverture du fichier impossible"); \
+                fprintf(stderr, "ERROR : Cannot open the file"); \
                 exit(EXIT_FAILURE); \
             }\
 }
 
 /**
- * \def TESTALLOC(X) Macro verifiant si un pointeur a bien ete associe a une adresse suite a une allocation dynamique, si ce n'est pas le cas on arrete le programme
- */
+ * \def TESTALLOC(X) Macro used to check if a pointer was correctly associated to an memory adress after a dynamic allocatione, if not then the program is stopped
+*/
 
 #define TESTALLOC(X){\
             if(X==NULL){\
-                fprintf(stderr, "ERREUR : Allocation impossible"); \
+                fprintf(stderr, "ERROR : Cannot allocate memory"); \
                 exit(EXIT_FAILURE); \
             }\
 }
 
 /**
  * \struct FileBuffer Structures_Define.h
- * \brief Buffer contenant un fichier ou du texte
- */
+ * \brief Buffer containing a file or text
+*/
 
 typedef struct FileBuffer{
-    unsigned char* texte; /*!< texte contenu dans le buffer */
-    int taille; /*!< taille du buffer (nombre de caracteres) */
+    unsigned char* text; /*!< text contained in the buffer*/
+    int size; /*!< size of the buffer (number of characters)*/
 }FileBuffer;
 
 /**
- * \struct ListeCode Structures_Define.h
- * \brief Noeud d'une liste contenant une suite de caracteres 0 ou 1
- */
+ * \struct listCode Structures_Define.h
+ * \brief Node of a linked list containing a sequence of characters 0 or 1
+*/
 
-typedef struct ListeCode{
-    unsigned char valeur; /*!< caractere contenu dans le noeud (0 ou 1) */
-    struct ListeCode *suivant; /*!< pointeur vers le noeud suivant */
-}ListeCode;
+typedef struct listCode{
+    unsigned char value; /*!< character contained in the node (0 ou 1)*/
+    struct listCode *next; /*!< pointer to the next node*/
+}listCode;
 
-typedef ListeCode* PtrListeCode;
-
-/**
- * \struct CaseTabOccurrences Structures_Define.h
- * \brief Case d'un tableau associant a des caracteres leur nombre d'occurrences et leur nombre dans la case (taille de la chaine c)
- */
-
-typedef struct CaseTabOccurrences{
-    int occurrences; /*!< nombre d'occurrences des caracteres contenus dans c*/
-    unsigned char* c; /*!< chaine de caracteres */
-    int taille; /*!< taille de la chaine c*/
-}CaseTabOccurrences;
+typedef listCode* PtrlistCode;
 
 /**
- * \struct CaseTableHuffman Structures_Define.h
- * \brief Case d'un tableau associant a un caractere un code binaire.
- */
+ * \struct OccurrencesArrayCell Structures_Define.h
+ * \brief Cell of an array associating characters to their number of occurrences and to the size of c : the string containing those characters
+*/
 
-typedef struct CaseTableHuffman{
-    unsigned char c; /*!< caractere auquel on associe le code*/
-    PtrListeCode code; /*!< liste chainee contenant le code binaire associe a c*/
-}CaseTableHuffman;
+typedef struct OccurrencesArrayCell{
+    int occurrences; /*!< number of occurrences of the characters contained in c*/
+    unsigned char* c; /*!< string*/
+    int size; /*!< size of the string c*/
+}OccurrencesArrayCell;
+
+/**
+ * \struct HuffmanTableCell Structures_Define.h
+ * \brief Cell of an array associating a character to a binary code
+*/
+
+typedef struct HuffmanTableCell{
+    unsigned char c; /*!< character to which we associate the code*/
+    PtrlistCode code; /*!< linked list containing the binary code associated to the character c*/
+}HuffmanTableCell;
 
 #endif

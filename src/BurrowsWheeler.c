@@ -1,40 +1,40 @@
 /**
  * \file BurrowsWheeler.c
- * \brief Applique Burrows Wheeler sur le fichier transmis a la fonction, ou bien applique son inverse pour revenir au texte initial.
+ * \brief Apply Burrows Wheeler to the given file (encode) or apply its inverse to get back the initial file (decode)
  * \author Robin Meneust
- * \date 4 juin 2021
- */
+ * \date 2021
+*/
 
 #include "../include/Structures_Define.h"
 #include "../include/FonctionsHuffman.h"
 /**
- * \fn unsigned char ** allouerMatBW(long taille)
- * \brief Alloue la matrice carree de caracteres dont la taille est donnee en parametre
- * \param taille Taille de la matrice matBW
- */
+ * \fn unsigned char ** allocateMatBW(long size)
+ * \brief Allocate the square matrix of characters given with its size
+ * \param size size of the matBW matrix
+*/
 
-unsigned char ** allouerMatBW(long taille)
+unsigned char ** allocateMatBW(long size)
 {
-    unsigned char** mat_retour = NULL;
-    mat_retour = malloc(taille*sizeof(unsigned char*));
-    TESTALLOC(mat_retour);
-    for(long i=0; i<taille; i++){
-        mat_retour[i] = malloc(taille*sizeof(unsigned char));
-        TESTALLOC(mat_retour[i]);
+    unsigned char** mat_return = NULL;
+    mat_return = malloc(size*sizeof(unsigned char*));
+    TESTALLOC(mat_return);
+    for(long i=0; i<size; i++){
+        mat_return[i] = malloc(size*sizeof(unsigned char));
+        TESTALLOC(mat_return[i]);
     }
-    return mat_retour;
+    return mat_return;
 }
 
 /**
- * \fn void libererMat(unsigned char** matBW, long taille)
- * \brief Libere la matrice carree de caracteres dont la taille est donnee en parametre
- * \param matBW Matrice a liberer
- * \param taille Taille de la matrice matBW
- */
+ * \fn void freeMatBW(unsigned char** matBW, long size)
+ * \brief Free the given square matrix of characters
+ * \param matBW Matrix that we have to free
+ * \param size Size of the given matrix
+*/
 
-void libererMat(unsigned char** matBW, long taille)
+void freeMatBW(unsigned char** matBW, long size)
 {
-    for(long i=0; i<taille; i++){
+    for(long i=0; i<size; i++){
         free(matBW[i]);
     }
     free(matBW);
@@ -44,58 +44,58 @@ void libererMat(unsigned char** matBW, long taille)
 
 
 /**
- * \fn void remplissageDecale(FILE* fichierEntree, unsigned char** matBW, long taille, int position)
- * \brief Remplit une ligne de la matrice matBW avec tout le texte du fichier initial, en partant du caractere a l'indice "position" et en continuant jusqu'a avoir entre tout le texte. Si on arrive a la fin du fichier et qu'on n'a pas rempli la ligne on revient au debut du fichier
- * \param fichierEntree Fichier texte initial a compresser
- * \param matBW Matrice carree triee contenant en derniere colonne le texte a sauvegarder
- * \param taille Taille de la matrice matBW
- * \param position Ligne a remplir. Correpond aussi au decalage vers la droite (indice du 1er caractere lu)
- */
+ * \fn void shiftedFilling(FILE* fileIn, unsigned char** mat, long size, int position)
+ * \brief Fill a line of the matrix matBW with all the content of the initial file, it begins with the character at the index "position" and coontinues until all the content as been enter. If we get to the end of the file without filling all the line then we go back to the beginning of the file
+ * \param fileIn Initial file that we have to compress
+ * \param mat Sorted matrix that we fill
+ * \param size Size of matBW
+ * \param position Line filled here. Also corresponds to the right shift compared to the initial line (the first one in this matrix)
+*/
 
-void remplissageDecale(FILE* fichierEntree, unsigned char** matBW, long taille, long position)
+void shiftedFilling(FILE* fileIn, unsigned char** mat, long size, long position)
 {
     unsigned char c;
     long i=position;
-    rewind(fichierEntree);
-    c = fgetc(fichierEntree);
-    while(!feof(fichierEntree)){
-        matBW[position][i] = c;
+    rewind(fileIn);
+    c = fgetc(fileIn);
+    while(!feof(fileIn)){
+        mat[position][i] = c;
         i++;
-        if(i==taille){
+        if(i==size){
             i=0;
         }
-        c=fgetc(fichierEntree);
+        c=fgetc(fileIn);
     }
-    rewind(fichierEntree);
+    rewind(fileIn);
 }
 
 /**
- * \fn long triMat(char** mat, long taille)
- * \brief Trie par ordre alphabetique chaque ligne de la matrice de caracteres donnee en entree en ne considerant que le 1er caractere de chaque ligne, puis si les 2 caracteres sont egaux on considere les suivants
- * \param mat Matrice de caracteres a trier
- * \param taille Taille de la matrice mat
- * \return Indice de la ligne de la matrice matBW correspondant au texte initial
- */
+ * \fn long sortMat(char** mat, long size)
+ * \brief Sort by ascending value each line of the matrix mat, it considers only the first character of each line, and if those 2 characters are equal then we use the next ones to sort the matrix
+ * \param mat Matrix that we are sorting
+ * \param size Size of the given matrix
+ * \return Index of the line of the sorted matrix that corresponds to the initial text (used only for compression in older versions of this project)
+*/
 
-long triMat(unsigned char** mat, long taille)
+void sortMat(unsigned char** mat, long size)
 {
     long i0=0;
     long j=0;
     long k=0;
-    int continuer;
+    int repeat;
     unsigned char* temp = NULL;
-    for(long i=1; i<taille; i++){
+    for(long i=1; i<size; i++){
         j=i-1;
         temp = mat[i];
-        continuer=1;
-        while(j>=0 && continuer && temp[0] <= mat[j][0]){
-            if(temp[0] == mat[j][0]){   // si les 2 premieres lettres des lignes comparees sont identiques
+        repeat=1;
+        while(j>=0 && repeat && temp[0] <= mat[j][0]){
+            if(temp[0] == mat[j][0]){   // si les 2 premieres lettres des lines comparees sont identiques
                 k=0;
-                while(k<taille && temp[k] == mat[j][k]){    // on cherche la 1re lettre differente entre les 2 lignes
+                while(k<size && temp[k] == mat[j][k]){    // on cherche la 1re lettre differente entre les 2 lines
                     k++;
                 }
-                if(k<taille){   // Si les 2 sont differents
-                    if(temp[k]<mat[j][k]){ // Si le texte de la ligne j est encore plus "grand" que celui de la ligne i (a inserer) par ordre alphabetique
+                if(k<size){   // Si les 2 sont differents
+                    if(temp[k]<mat[j][k]){ // Si le text de la line j est encore plus "grand" que celui de la line i (a inserer) par ordre alphabetique
                         mat[j+1] = mat[j];
                         if(j==i0){
                             i0++;
@@ -103,11 +103,11 @@ long triMat(unsigned char** mat, long taille)
                         j--;
                     }
                     else{
-                        continuer = 0;
+                        repeat = 0;
                     }
                 }
                 else{
-                    continuer=0;
+                    repeat=0;
                 }
             }
             else{
@@ -126,40 +126,40 @@ long triMat(unsigned char** mat, long taille)
 
 
 /**
- * \fn void sauvegarderTexteBW(FILE* fichierBW, unsigned char** matBW, long taille, long i0)
- * \brief Sauvegarde la derniere colonne de la matrice matBW dans le fichier fichierBW
- * \param fichierBW Fichier texte genere par cette fonction (c'est le texte du fichierEntree auquel on applique Burrows Wheeler)
- * \param matBW Matrice carree triee contenant en derniere colonne le texte a sauvegarder
- * \param taille Taille de la matrice matBW
- * \param i0 Indice a ecrire au debut de la chaine, correspond a la ligne de la matrice matBW correspondant au texte initial
- */
+ * \fn void saveBWEncode(FILE* fileBW, unsigned char** matBW, long size, long i0)
+ * \brief Save the last column of matWB in the file fileBW
+ * \param fileBW File that will contain the result of the application of Burrows Wheeler on the initial file
+ * \param matBW Sorted square matrix containing in its last column the text that is being saved in fileBW
+ * \param size Size of the matrix matBW
+ * \param i0 Index written at the beginning of the string, corresponds to the line of matBW containing the content of the initial file
+*/
 
-void sauvegarderTexteBW(FILE* fichierBW, unsigned char** matBW, long taille, long i0)
+void saveBWEncode(FILE* fileBW, unsigned char** matBW, long size, long i0)
 {
-    fprintf(fichierBW, "%ld\n", i0);
-    for(int i=0; i<taille; i++){
-        fputc(matBW[i][taille-1], fichierBW);
+    fprintf(fileBW, "%ld\n", i0);
+    for(int i=0; i<size; i++){
+        fputc(matBW[i][size-1], fileBW);
     }
 }
 
 
 /**
- * \fn void remplissageColonneDecode(FileBuffer bufferBW, unsigned char** matBW, long taille, long decalage)
- * \brief Decale toutes les colonnes d'une case a droite et remplit la 1re avec le texte du fichier fichierBW
- * \param bufferBW Buffer de text genere par cette fonction (c'est le texte du fichierEntree auquel on a applique Burrows Wheeler)
- * \param matBW Matrice carree triee contenant en derniere colonne le texte a sauvegarder
- * \param taille Taille de la matrice matBW
- * \param decalage Indique le nombre de decalages de colonnes a effectuer(de 0 a taille-1)
- */
+ * \fn void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, long shift)
+ * \brief Decale toutes les colonnes d'une case a droite et remplit la 1re avec le text du file fileBW
+ * \param bufferBW Buffer de text genere par cette fonction (c'est le text du fileIn auquel on a applique Burrows Wheeler)
+ * \param matBW Matrice carree triee contenant en derniere colonne le text a sauvegarder
+ * \param size size de la matrice matBW
+ * \param shift Indique le nombre de shifts de colonnes a effectuer(de 0 a size-1)
+*/
 
-void remplissageColonneDecode(FileBuffer bufferBW, unsigned char** matBW, long taille, long decalage)
+void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, long shift)
 {
     int pos=0;
-    for(long i=0; i<taille; i++){
-        for(int j=decalage; j>0; j--){
+    for(long i=0; i<size; i++){
+        for(int j=shift; j>0; j--){
             matBW[i][j]=matBW[i][j-1];
         }
-        matBW[i][0]=bufferBW.texte[pos];
+        matBW[i][0]=bufferBW.text[pos];
         pos++;
     }
 }
@@ -167,19 +167,18 @@ void remplissageColonneDecode(FileBuffer bufferBW, unsigned char** matBW, long t
 
 
 /**
- * \fn void sauvegarderTexteBWDecode(FILE* fichierBWDecode, unsigned char** matBW, long taille, long i0)
- * \brief Sauvegarde dans un fichier le texte recupere a partir de l'operation inverse de burrows wheeler
- * \param fichierBWDecode Fichier texte genere par cette fonction (c'est le texte initial avant compression)
- * \param matBW Matrice carree triee contenant en derniere colonne le texte a sauvegarder
- * \param taille Taille de la matrice matBW
- * \param i0 Indice correspondant a la ligne de la matrice matBW contenant le texte initial
- */
+ * \fn void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
+ * \brief Save in a file the text obtained after applying the inverse of Burrows Wheeler (decode)
+ * \param fileBWDecode File filled by this function, it's the content of the initial file before applying Burrows Wheeler
+ * \param matBW Sorted square matrix containing in its last coluln the text saved here
+ * \param size Size of the matrix matBW
+ * \param i0 Index written at the beginning of the string, corresponds to the line of matBW containing the content of the initial file
+*/
 
-void sauvegarderTexteBWDecode(FILE* fichierBWDecode, unsigned char** matBW, long taille, long i0)
+void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
 {
-    printf("BW Save:\n");
-    for(int i=0; i<taille; i++){
-        fputc(matBW[i0][i], fichierBWDecode);
+    for(int i=0; i<size; i++){
+        fputc(matBW[i0][i], fileBWDecode);
         printf("%c", matBW[i0][i]);
     }
     printf("\n");
@@ -187,110 +186,110 @@ void sauvegarderTexteBWDecode(FILE* fichierBWDecode, unsigned char** matBW, long
 
 
 /**
- * \fn void tri(unsigned char* tabCar,int* indices, int taille)
- * \brief Trie le tableau d'indices afin d'obtenir le texte encode, en lisant le tableau tabCar en lisant a partir des indices du tableau indices
- * \param tabCar Tableau contenant un texte dont les indices seront tries dans le tableau indices
- * \param indices Tableau des indices du tableau tabCar
- * \param taille Taille des tableaux tabCar et indices
- */
+ * \fn void rotationSort(unsigned char* tabChar,int* indexes, int size)
+ * \brief Sort the array of indexes to get the encoded text, it reads the array tabChar by reading from the indexes of the array indexes
+ * \param tabChar Array containing a string whose cells will be sorted in the array indexes by this function
+ * \param indexes Array of the tabChar indexes
+ * \param size Size of the arrays tabChar and indexes
+*/
 
-void tri(unsigned char* tabCar,int* indices, int taille)
+void rotationSort(unsigned char* tabChar,int* indexes, int size)
 {
-    int avancement=0;
-    for(int i=0;i<taille-1;i++)
+    int progress=0;
+    for(int i=0;i<size-1;i++)
     {
         int j=i+1;
         int min=i;
-        while(j<taille)
+        while(j<size)
         {
             int k=0;
-            while(tabCar[(indices[j]+k)%taille]==tabCar[(indices[min]+k)%taille] && k<taille)
+            while(tabChar[(indexes[j]+k)%size]==tabChar[(indexes[min]+k)%size] && k<size)
                 k++;
-            if(tabCar[(indices[j]+k)%taille]<tabCar[(indices[min]+k)%taille])
+            if(tabChar[(indexes[j]+k)%size]<tabChar[(indexes[min]+k)%size])
             {
                 min=j;
             }
             j++;
         }
-        int tmp = indices[min];
-        indices[min] = indices[i];
-        indices[i] = tmp;
-        if(avancement+5<((i+1)*100)/taille) //Affiche l'etat d'anvancement de la tache
+        int tmp = indexes[min];
+        indexes[min] = indexes[i];
+        indexes[i] = tmp;
+        if(progress+5<((i+1)*100)/size) //Affiche l'etat d'anvancement de la tache
         {
-            avancement=(int)((((i+1)*100)/taille)/5)*5;
-            printf("%d%%\n",avancement);
+            progress=(int)((((i+1)*100)/size)/5)*5;
+            printf("%d%%\n",progress);
         }
     }
 }
 
 
 /**
- * \fn int burrowsWheeler(FileBuffer* bufferEntree)
- * \brief Applique la methode Burrows-Wheeler sur le fichier fichierEntree et le sauvegarde dans un nouveau fichier
- * \param bufferEntree Buffer de texte genere par la fonction burrowsWheeler (fichier d'entree)
- * \return Indice permettant de decoder le texte BW
+ * \fn int burrowsWheeler(FileBuffer* bufferIn)
+ * \brief Apply Burrows Wheeler to bufferIn
+ * \param bufferIn Buffer on which is applied Burrows Wheeler
+ * \return Index used to decode the text encoded with Burrows Wheeler
 */
 
-int burrowsWheeler(FileBuffer* bufferEntree)
+int burrowsWheeler(FileBuffer* bufferIn)
 {
-    int taille = bufferEntree->taille;
-    unsigned char* tabCar=malloc(sizeof(unsigned char)*taille);
-    int* indices=malloc(sizeof(int)*taille);
-    for(int i=0;i<taille;i++)
+    int size = bufferIn->size;
+    unsigned char* tabChar=malloc(sizeof(unsigned char)*size);
+    int* indexes=malloc(sizeof(int)*size);
+    for(int i=0;i<size;i++)
     {
-        tabCar[i]=bufferEntree->texte[i];
-        indices[i]=i;
+        tabChar[i]=bufferIn->text[i];
+        indexes[i]=i;
     }
-    tri(tabCar,indices,taille);
+    rotationSort(tabChar,indexes,size);
     int i=0;
-    int debut=0;
-    while(i<taille)
+    int beginning=0;
+    while(i<size)
     {
-        if(indices[i]==0)
+        if(indexes[i]==0)
         {
-            debut=i;
+            beginning=i;
             break;
         }
         i++;
     }
 
-    for(int i=0;i<taille;i++)
+    for(int i=0;i<size;i++)
     {
-        int id = indices[i]-1;
+        int id = indexes[i]-1;
         if(id==-1)
-            id=taille-1;
-        bufferEntree->texte[i]=tabCar[id];
+            id=size-1;
+        bufferIn->text[i]=tabChar[id];
     }
-    free(tabCar);
-    free(indices);
+    free(tabChar);
+    free(indexes);
 
-    return debut;
+    return beginning;
 }
 
 /**
- * \fn void burrowsWheelerDecode(FileBuffer bufferEntree, FILE* fichierBWDecode)
- * \brief Applique la methode inverse de Burrows-Wheeler sur le fichier fichierBW et le sauvegarde dans un nouveau fichier fichierBWDecode
- * \param indiceBW Indice permettant de decoder le texte BW
- * \param bufferEntree Buffer de texte genere par la fonction burrowsWheeler (fichier d'entree)
- * \param fichierBWDecode Fichier texte genere par cette fonction (c'est le texte initial avant compression) (fichier de sortie)
- */
+ * \fn void burrowsWheelerDecode(FileBuffer bufferIn, FILE* fileBWDecode)
+ * \brief Apply the inverse of Burrows-Wheeler to bufferIn and save it in fileBWDecode
+ * \param indexBW Index used to decode the text encoded with Burrows Wheeler
+ * \param bufferInBuffer Buffer on which is applied the inverse of Burrows Wheeler Buffer
+ * \param fileBWDecode File in which is saved the result
+*/
 
-void burrowsWheelerDecode(int indiceBW, FileBuffer bufferEntree, FILE* fichierBWDecode)
+void burrowsWheelerDecode(int indexBW, FileBuffer bufferIn, FILE* fileBWDecode)
 {
-    long taille = bufferEntree.taille;
-    int avancement=0;
-    unsigned char ** matBW = allouerMatBW(taille);
-    for(long i=0; i<taille; i++){
-        remplissageColonneDecode(bufferEntree, matBW, taille, i);
-        triMat(matBW, taille);
-        if(avancement+5<((i+1)*100)/taille)
+    long size = bufferIn.size;
+    int progress=0;
+    unsigned char ** matBW = allocateMatBW(size);
+    for(long i=0; i<size; i++){
+        fillColumnBWDecode(bufferIn, matBW, size, i);
+        sortMat(matBW, size);
+        if(progress+5<((i+1)*100)/size)
         {
-            avancement=(int)((((i+1)*100)/taille)/5)*5; //Affiche l'etat d'anvancement de la tache
-            printf("%d%%\n", avancement);
+            progress=(int)((((i+1)*100)/size)/5)*5; //Affiche l'etat d'anvancement de la tache
+            printf("%d%%\n", progress);
         }
     }
 
-    rewind(fichierBWDecode);
-    sauvegarderTexteBWDecode(fichierBWDecode, matBW, taille, indiceBW);
-    libererMat(matBW, taille);
+    rewind(fileBWDecode);
+    saveBWDecode(fileBWDecode, matBW, size, indexBW);
+    freeMatBW(matBW, size);
 }

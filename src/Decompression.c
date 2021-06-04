@@ -1,55 +1,55 @@
 /**
  * \file Decompression.c
- * \brief Decompresse le fichier fichier "compresse.bin" en utilisant la table de codage table.txt precedemment creee.
+ * \brief Decompresse le file file "compresse.bin" en utilisant la table de codage table.txt precedemment creee.
  * \author Robin Meneust
- * \date 4 juin 2021
- */
+ * \date 2021
+*/
 
 #include "../include/Structures_Define.h"
 #include "../include/FonctionsHuffman.h"
 
 
 /**
- * \fn int initialiserTabElementsPossibles(int* tabElements, FILE* fichierTable)
- * \brief Initialise le tableau tabElements pour que seules les cases associees aux caracteres presents dans la fichierTable soient a 1 (et les autres a 0)
- * \param tabElements Tableau contenant les caracteres associes a 1 (s'ils correspondent au code) ou a 0 (dans l'autre cas)
- * \param fichierTable Fichier contenant la table Huffman (caracteres associes a leur code binaire)
+ * \fn int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
+ * \brief Initialise le tableau possibleElementsArray pour que seules les cases associees aux caracteres presents dans la fileTable soient a 1 (et les autres a 0)
+ * \param possibleElementsArray Tableau contenant les caracteres associes a 1 (s'ils correspondent au code) ou a 0 (dans l'autre cas)
+ * \param fileTable file contenant la table Huffman (caracteres associes a leur code binaire)
  * \return Nombre de cases non nulles
- */
+*/
 
-int initialiserTabElementsPossibles(int* tabElements, FILE* fichierTable)
+int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
 {
     int nbElements=0;
     unsigned char c;
-    rewind(fichierTable);
-    retourLigneFichier(fichierTable);
-    retourLigneFichier(fichierTable);
-    retourLigneFichier(fichierTable);
-    c=fgetc(fichierTable);
+    rewind(fileTable);
+    wordWrapFile(fileTable);
+    wordWrapFile(fileTable);
+    wordWrapFile(fileTable);
+    c=fgetc(fileTable);
     for(int i=0; i<N_ASCII; i++){
-        tabElements[i]=0;
+        possibleElementsArray[i]=0;
     }
-    while(!feof(fichierTable)){
-        tabElements[c]=1;
+    while(!feof(fileTable)){
+        possibleElementsArray[c]=1;
         nbElements++;
-        retourLigneFichier(fichierTable);
-        c=fgetc(fichierTable);
+        wordWrapFile(fileTable);
+        c=fgetc(fileTable);
     }
     return nbElements;
 }
 
 /**
- * \fn unsigned char rechPremierIndiceNonNul(int* tabElements)
- * \brief Recherche le premier indice correspondant a une case non nulle dans le tableau donne en parametre
- * \param tabElements Tableau d'entier de N_ASCII cases
- * \return Premier indice du tableau tabElements (caractere) donc la valeur associee est non nulle
- */
+ * \fn unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
+ * \brief Recherche le premier index correspondant a une case non nulle dans le tableau donne en parametre
+ * \param possibleElementsArray Tableau d'entier de N_ASCII cases
+ * \return Premier index du tableau possibleElementsArray (caractere) donc la valeur associee est non nulle
+*/
 
 
-unsigned char rechPremierIndiceNonNul(int* tabElements)
+unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
 {
     for(unsigned char i=0; i<N_ASCII; i++){
-        if(tabElements[i]==1){
+        if(possibleElementsArray[i]==1){
             return i;
         }
     }
@@ -58,27 +58,27 @@ unsigned char rechPremierIndiceNonNul(int* tabElements)
 }
 
 /**
- * \fn actualiserTabElementsPossibles(int* tabElements, FILE* table, uint8_t bit, int position, int* nbElements)
- * \brief Actualise le tableau tabElements en fonction du bit et de la position etudies (en comparant les valeurs du fichier table a ce bit)
- * \param tabElements Tableau contenant les caracteres associes a 1 (s'ils correspondent au code) ou a 0 (dans l'autre cas)
- * \param table Fichier contenant la table Huffman (caracteres associes a leur code binaire)
- * \param bit Bit etudie, a comparer a la valeur binaire a la position etudiee dans le fichier table
- * \param position Position du code etudiee dans le fichier table, nombre positif, 0 correspond a la 1re valeur du code d'une ligne et plus ce nombre est grand plus on se deplace a droite
- * \param nbElements Nombre de cases de tabElements non nulles
- */
+ * \fn refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8_t bit, int position, int* nbElements)
+ * \brief Actualise le tableau possibleElementsArray en fonction du bit et de la position etudies (en comparant les valeurs du file table a ce bit)
+ * \param possibleElementsArray Tableau contenant les caracteres associes a 1 (s'ils correspondent au code) ou a 0 (dans l'autre cas)
+ * \param table file contenant la table Huffman (caracteres associes a leur code binaire)
+ * \param bit Bit etudie, a comparer a la valeur binaire a la position etudiee dans le file table
+ * \param position Position du code etudiee dans le file table, nombre positif, 0 correspond a la 1re valeur du code d'une line et plus ce nombre est grand plus on se deplace a droite
+ * \param nbElements Nombre de cases de possibleElementsArray non nulles
+*/
 
-void actualiserTabElementsPossibles(int* tabElements, FILE* table, uint8_t bit, int position, int* nbElements)
+void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8_t bit, int position, int* nbElements)
 {
     rewind(table);
-    retourLigneFichier(table);
-    retourLigneFichier(table);
-    retourLigneFichier(table);
+    wordWrapFile(table);
+    wordWrapFile(table);
+    wordWrapFile(table);
     unsigned char c = fgetc(table);
     unsigned char c_table;
     int i=0;
 
     while(!feof(table)){
-        if(tabElements[c]!=0){
+        if(possibleElementsArray[c]!=0){
             c_table=fgetc(table);
             i=0;
             while(i<position && c_table!='\n' && !feof(table)){
@@ -86,11 +86,11 @@ void actualiserTabElementsPossibles(int* tabElements, FILE* table, uint8_t bit, 
                 i++;
             }
             if(c_table-'0'!=bit){
-                tabElements[c]=0;
+                possibleElementsArray[c]=0;
                 (*nbElements)--;
             }
         }
-        retourLigneFichier(table);
+        wordWrapFile(table);
         c = fgetc(table);
     }
 }
@@ -98,60 +98,60 @@ void actualiserTabElementsPossibles(int* tabElements, FILE* table, uint8_t bit, 
 
 
 /**
- * \fn void decompresser(FILE* fichierEntree, FILE* bufferSortie, FILE* fichierTable)
- * \brief Decompresse le fichierEntree a partir du fichier table.txt
- * \param fichierEntree Fichier texte initial a decompresser
- * \param bufferSortie Buffer decompresse genere par cette fonction
- * \param fichierTable Fichier contenant la table Huffman
- */
+ * \fn void decompress(FILE* fileIn, FILE* bufferOut, FILE* fileTable)
+ * \brief Decompresse le fileIn a partir du file table.txt
+ * \param fileIn file text initial a decompress
+ * \param bufferOut Buffer decompresse genere par cette fonction
+ * \param fileTable file contenant la table Huffman
+*/
 
 
-void decompresser(FILE* fichierEntree, FileBuffer* bufferSortie, FILE* fichierTable)
+void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
 {
-    int tailleFichierEntree = lireLigneNombre(fichierTable, 2);
+    int fileSizeEntree = readNumberLine(fileTable, 2);
     int nbAjouts=0; // nombre de caracteres decompresses
     uint8_t buffer=0;
     uint8_t bit;
-    int avancement=0;
-    int tailleBuffer;
+    int progress=0;
+    int sizeBuffer;
     int position;
-    int tabElementsPossibles[N_ASCII];  // contient 0 ou 1 : 1 = la sequence correspond et 0 sinon
+    int possibleElementsArrayPossibles[N_ASCII];  // contient 0 ou 1 : 1 = la sequence correspond et 0 sinon
     int nbElementsPossibles = N_ASCII;
     int pos=0;
-    bufferSortie->texte = (unsigned char*) malloc(sizeof(unsigned char)*tailleFichierEntree);
-    bufferSortie->taille=tailleFichierEntree;
-    rewind(fichierEntree);
-    buffer=fgetc(fichierEntree);
+    bufferOut->text = (unsigned char*) malloc(sizeof(unsigned char)*fileSizeEntree);
+    bufferOut->size=fileSizeEntree;
+    rewind(fileIn);
+    buffer=fgetc(fileIn);
     position=0;
-    tailleBuffer=8;
-    nbElementsPossibles = initialiserTabElementsPossibles(tabElementsPossibles, fichierTable);
-    while(nbAjouts<tailleFichierEntree && nbElementsPossibles!=0){
-        while(tailleBuffer!=0 && nbElementsPossibles!=0 && nbAjouts<tailleFichierEntree){
-            bit = buffer & (1<<(tailleBuffer-1));  // on applique un masque pour recuperer le bit a la position tailleBuffer-1 (entre 2^0 et 2^7)
-            if(tailleBuffer>1){
-                bit >>= tailleBuffer-1;  // on decale vers la droite afin d'avoir la valeur etudiee completement a droite (et donc d'avoir bit valant 0 ou 1)
+    sizeBuffer=8;
+    nbElementsPossibles = initializePossibleElementsArray(possibleElementsArrayPossibles, fileTable);
+    while(nbAjouts<fileSizeEntree && nbElementsPossibles!=0){
+        while(sizeBuffer!=0 && nbElementsPossibles!=0 && nbAjouts<fileSizeEntree){
+            bit = buffer & (1<<(sizeBuffer-1));  // on applique un masque pour recuperer le bit a la position sizeBuffer-1 (entre 2^0 et 2^7)
+            if(sizeBuffer>1){
+                bit >>= sizeBuffer-1;  // on decale vers la droite afin d'avoir la valeur etudiee completement a droite (et donc d'avoir bit valant 0 ou 1)
             }
-            actualiserTabElementsPossibles(tabElementsPossibles, fichierTable, bit, position, &nbElementsPossibles);
+            refreshPossibleElementsArray(possibleElementsArrayPossibles, fileTable, bit, position, &nbElementsPossibles);
             position++;
             if(nbElementsPossibles==1){ // il ne reste plus qu'une possibilite, c'est donc le bon caractere
-                unsigned char c=rechPremierIndiceNonNul(tabElementsPossibles);
-                bufferSortie->texte[pos]=c;
+                unsigned char c=seekFirstPositiveIndex(possibleElementsArrayPossibles);
+                bufferOut->text[pos]=c;
                 pos++;
                 position=0;
-                nbElementsPossibles = initialiserTabElementsPossibles(tabElementsPossibles, fichierTable);
+                nbElementsPossibles = initializePossibleElementsArray(possibleElementsArrayPossibles, fileTable);
                 nbAjouts++;
             }
-            tailleBuffer--;
+            sizeBuffer--;
         }
 
-        if(avancement+5<((nbAjouts+1)*100)/tailleFichierEntree)
+        if(progress+5<((nbAjouts+1)*100)/fileSizeEntree)
         {
-            avancement=(int)((((nbAjouts+1)*100)/tailleFichierEntree)/5)*5; //Affiche l'etat d'anvancement de la tache
-            printf("%d%%\n", avancement);
+            progress=(int)((((nbAjouts+1)*100)/fileSizeEntree)/5)*5; //Affiche l'etat d'anvancement de la tache
+            printf("%d%%\n", progress);
         }
 
-        buffer=fgetc(fichierEntree);
-        tailleBuffer=8;
+        buffer=fgetc(fileIn);
+        sizeBuffer=8;
     }
 
     if(nbElementsPossibles==0){
@@ -161,53 +161,53 @@ void decompresser(FILE* fichierEntree, FileBuffer* bufferSortie, FILE* fichierTa
 
 
 /**
- * \fn void decompresserMain(char* nomFichierEntree)
- * \brief Fonction principale pour la decompression : appelle les fonctions necessaires a la decompression du fichier "fichier decompresse.txt" dans le meme repertoire que le programme
- * \param nomFichierEntree Nom du fichier a decompresser
- */
+ * \fn void decompressMain(char* fileNameIn)
+ * \brief Fonction principale pour la decompression : appelle les fonctions necessaires a la decompression du file "file decompresse.txt" dans le meme repertoire que le programme
+ * \param fileNameIn Nom du file a decompress
+*/
 
 
-void decompresserMain(char* nomFichierEntree)
+void decompressMain(char* fileNameIn)
 {
-    FILE* fichierEntree;
-    FILE* fichierSortie;
-    FILE* fichierTable;
-    int indiceBW;
+    FILE* fileIn;
+    FILE* fileOut;
+    FILE* fileTable;
+    int indexBW;
 
-    fichierEntree = fopen(nomFichierEntree, "rb");
-    TESTFOPEN(fichierEntree);
-    fichierTable = fopen("table.txt", "rb");
-    TESTFOPEN(fichierTable);
+    fileIn = fopen(fileNameIn, "rb");
+    TESTFOPEN(fileIn);
+    fileTable = fopen("table.txt", "rb");
+    TESTFOPEN(fileTable);
 
-    indiceBW=lireLigneNombre(fichierTable, 0);
+    indexBW=readNumberLine(fileTable, 0);
 
-    printf("\nDecompression du fichier selon la table...\n");
-    FileBuffer bufferTexte;
-    decompresser(fichierEntree, &bufferTexte, fichierTable);
-    FCLOSE(fichierEntree);
+    printf("\nDecompression du file selon la table...\n");
+    FileBuffer buffertext;
+    decompress(fileIn, &buffertext, fileTable);
+    FCLOSE(fileIn);
     
-    int option=lireLigneNombre(fichierTable, 1);
+    int option=readNumberLine(fileTable, 1);
     printf("opt : %d\n", option);
-    FCLOSE(fichierTable);
+    FCLOSE(fileTable);
     
-    int tailleNomFichierEntree = chercherTailleChaine(nomFichierEntree);
-    if(nomFichierEntree[tailleNomFichierEntree-4]=='.' && nomFichierEntree[tailleNomFichierEntree-3]=='b' && nomFichierEntree[tailleNomFichierEntree-2]=='i' && nomFichierEntree[tailleNomFichierEntree-1]=='n'){
-        nomFichierEntree[tailleNomFichierEntree-4]='\0';  //On enleve le .bin
+    int fileSizeNameEntree = seekStringSize(fileNameIn);
+    if(fileNameIn[fileSizeNameEntree-4]=='.' && fileNameIn[fileSizeNameEntree-3]=='b' && fileNameIn[fileSizeNameEntree-2]=='i' && fileNameIn[fileSizeNameEntree-1]=='n'){
+        fileNameIn[fileSizeNameEntree-4]='\0';  //On enleve le .bin
     }
 
-    //Cas ou le fichier existe deja
+    //Cas ou le file existe deja
     #if __linux__
-    if(access(nomFichierEntree, F_OK)!=0){
-        printf("ERREUR : Le fichier %s existe deja", nomFichierEntree);
-        printf("Saisissez un nom pour le fichier decompresse : \n");
-        saisieNomFichier(nomFichierEntree);
+    if(access(fileNameIn, F_OK)!=0){
+        printf("ERREUR : Le file %s existe deja", fileNameIn);
+        printf("Saisissez un nom pour le file decompresse : \n");
+        getFileName(fileNameIn);
     }
     #endif
     #if __WIN32__
-    if(_access(nomFichierEntree, 0)!=-1){
-        printf("ERREUR : Le fichier %s existe deja", nomFichierEntree);
-        printf("Saisissez un nom pour le fichier decompresse : \n");
-        saisieNomFichier(nomFichierEntree);
+    if(_access(fileNameIn, 0)!=-1){
+        printf("ERREUR : Le file %s existe deja", fileNameIn);
+        printf("Saisissez un nom pour le file decompresse : \n");
+        getFileName(fileNameIn);
     }
     #endif
 
@@ -216,21 +216,21 @@ void decompresserMain(char* nomFichierEntree)
     
 
 
-    fichierSortie = fopen(nomFichierEntree, "wb+"); 
-    TESTFOPEN(fichierSortie);
+    fileOut = fopen(fileNameIn, "wb+"); 
+    TESTFOPEN(fileOut);
     if(option==1)
     {
         printf("Application de l'inverse de Move To Front...\n");
-        moveToFrontDecode(&bufferTexte);
+        moveToFrontDecode(&buffertext);
 
         printf("\nApplication de l'inverse de Burrows Wheeler...\n");
-        burrowsWheelerDecode(indiceBW, bufferTexte, fichierSortie);
+        burrowsWheelerDecode(indexBW, buffertext, fileOut);
     }
     else
     {
-        chargerDansFichier(bufferTexte,fichierSortie);
+        bufferToFile(buffertext,fileOut);
     }
-    FCLOSE(fichierSortie);
-    free(bufferTexte.texte);
+    FCLOSE(fileOut);
+    free(buffertext.text);
     printf("\nLa decompression est terminee\n");
 }
