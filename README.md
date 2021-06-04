@@ -25,7 +25,7 @@ Directly open the created executable or use the command :
 ````
 make run
 ````
-Then follow the instructions displayed on the screen: give the name of the file with its path...
+Then follow the instructions displayed on the screen: give the name of the file with its path
 
 It's also possible to directly drag the file to be compressed onto the executable
 
