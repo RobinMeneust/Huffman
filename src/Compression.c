@@ -80,7 +80,7 @@ void compress(FileBuffer bufferBW, FILE* fileOut)
 
 /**
  * \fn void compressMain(char* fileNameIn)
- * \brief Main function for compression : call required functions to the decompression of the file whose name is given to the function
+ * \brief Main function for compression : calls required functions to the decompression of the file whose name is given to the function
  * \param fileNameIn Name of the file that is being compressed
 */
 

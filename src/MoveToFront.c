@@ -1,6 +1,6 @@
 /**
  * \file MoveToFront.c
- * \brief Applique le Move To Front sur le file transmis a la fonction, ou bien applique son inverse pour revenir au text initial.
+ * \brief Applied Move To Front to the given file or applies its inverse
  * \author Robin Meneust
  * \date 2021
 */
@@ -11,11 +11,11 @@
 
 /**
  * \fn int seekChar(unsigned char tab[], int size, unsigned char c)
- * \brief Cherche l'index de la 1re occurrence du caractere recherche
- * \param tab Tableau dans lequel on cherche le caractere
- * \param size size du tableau tab
- * \param c Caractere qu'on cherche
- * \return index du caractere recherche dans le tableau donne en parametre
+ * \brief Seeks the index of the first occurrence of the seeked character
+ * \param tab Array in which we seek the character
+ * \param size Size of the array tab
+ * \param c Seeked character
+ * \return Index of the character seeked in tab
 */
 
 
@@ -29,17 +29,17 @@ int seekChar(unsigned char tab[], int size, unsigned char c)
         }
         i++;
     }
-    fprintf(stderr, "ERREUR : Impossible de trouver le caractere dans chaercherCar dans MTF");
+    fprintf(stderr, "ERROR : Cannot find the character in seekChar in the function MTF");
     exit(EXIT_FAILURE);
 }
 
 
 /**
  * \fn void shiftCharStart(unsigned char tab[], int size, int index)
- * \brief Deplace le caractere de l'index donne en parametre au beginning de tab, en decalant tous les caracteres avant
- * \param tab Tableau dans lequel on decale le caractere
- * \param size size du tableau tab
- * \param index index du caractere a decaler
+ * \brief Moves to the beginning the character of the given index l'index and shift all the characters between the beginning and this index
+ * \param tab Array in which we shift the character at the given index
+ * \param size Size of the array tab
+ * \param index Index of the character that has to be shifted
 */
 
 
@@ -56,15 +56,15 @@ void shiftCharStart(unsigned char tab[],int size, int index)
 
 /**
  * \fn void moveToFrontEncode(FileBuffer *buffer)
- * \brief Applique le Move to front au buffer donne en parametre
- * \param buffer Buffer sur lequel on applique Move to Front
+ * \brief Applies Move to front to the given buffer
+ * \param buffer Buffer on which is applied MTF
 */
 
 void moveToFrontEncode(FileBuffer *buffer)
 {
     int index;
     unsigned char tabAscii[N_ASCII];
-    for(int i=0; i<N_ASCII; i++){   // int et non unsigned char car sinon i ne depasse jamais N_ASCII-1
+    for(int i=0; i<N_ASCII; i++){   // int and not unsigned char because in the latter case i would never exceeds N_ASCII-1, so it would be an infinite loop
         tabAscii[i]=i;
     }
     for(int i=0; i<buffer->size; i++){
@@ -76,15 +76,15 @@ void moveToFrontEncode(FileBuffer *buffer)
 
 /**
  * \fn void moveToFrontDecode(FileBuffer *buffer)
- * \brief Applique l'inverse de Move to front au buffer donne en parametre
- * \param buffer Buffer sur lequel on applique l'operation inverse de Move to Front
+ * \brief Applies the inverse of Move To Front to the given buffer
+ * \param buffer Buffer on which is applied the inverse of MTF
 */
 
 void moveToFrontDecode(FileBuffer *buffer)
 {
     unsigned char c=0;
     unsigned char tabAscii[N_ASCII];
-    for(int i=0; i<N_ASCII; i++){   // int et non unsigned char car sinon i ne depasse jamais N_ASCII-1
+    for(int i=0; i<N_ASCII; i++){
         tabAscii[i]=i;
     }
 

@@ -1,6 +1,6 @@
 /**
  * \file main.c
- * \brief Programme principal du projet. Permet le lancement de la compression ou de la decompression.
+ * \brief Main function of the project. Used to launch the compression or the decompression
  * \author Robin Meneust
  * \date 2021
 */
@@ -11,61 +11,61 @@
 
 /**
  * \fn int main(int argc, char *argv[])
- * \brief Fonction principale permettant de compress ou decompress un file donne en parametre, s'il n'y en a pas on redemande a l'utilisateur de saisir ce nom
+ * \brief Main function used to compress or decompress a file given in parameter, and if there isn't one then we ask the user to enter its name
 */
 
 int main(int argc, char *argv[])
 {
     char fileNameIn[FILENAME_MAX];
-    int choix=0;
+    int choice=0;
 
-    //Choix entre compression, decompression et sortie du programme
+    //Choice between compression, decompression and stoping the program
     printf("MENU\n\n");
-    printf("0 : Arreter le programme\n");
-    printf("1 : compress un file\n");
-    printf("2 : Decompress un file\n\n");
-    printf("Entrez le chiffre correpondant a l'operation a effectuer : ");
-    choix = fgetc(stdin)-'0';
-    while(choix<0 || choix>2){
-        printf("Veuillez entrez un chiffre entre 0 et 2 inclus : ");
-        choix = fgetc(stdin)-'0';
+    printf("0 : Exit\n");
+    printf("1 : Compress a file\n");
+    printf("2 : Decompress a file\n\n");
+    printf("Give a number between 0 and 2 that correponds to your choice : ");
+    choice = fgetc(stdin)-'0';
+    while(choice<0 || choice>2){
+        printf("\nIncorrect choice\nGive a number between 0 and 2 only : ");
+        choice = fgetc(stdin)-'0';
     }
     getchar();
-    printf("\nCHOIX %d :\n", choix);
+    printf("\nchoice %d :\n", choice);
 
-    if(choix!=0){
-        //Application de la fonction choisie
-        switch(choix){
+    if(choice!=0){
+        //Application of the chosen function
+        switch(choice){
             case 1 :
-                // Recuperation du nom de file a ouvrir
-                if(argc==2 && (strlen(argv[1])<FILENAME_MAX))// si la size de la string est correcte pour etre copie dans fileNameIn et s'il y a 2 arguments, car le premier est toujours le nom de l'executable
+                // Getting the name of the file that we will open
+                if(argc==2 && (strlen(argv[1])<FILENAME_MAX))// If the size of the string is correct to get copied in fileNameIn and if there are only 2 arguments (the executable and the name of the file dropped or given)
                     sprintf(fileNameIn, "%s", argv[1]);
                 else{
                     getFileName(fileNameIn);
                 }
 
-                if(!strcmp(fileNameIn, "table.txt")){ // le file d'entree ne doit pas avoir le meme nom que d'autres files utilises dans le programme
-                    fprintf(stderr, "ERREUR : Le nom du file doit etre different de table.txt");
+                if(!strcmp(fileNameIn, "table.txt")){ // The input file can't have the same name of other files used in this program
+                    fprintf(stderr, "ERROR : Le nom du file doit etre different de table.txt");
                     exit(EXIT_FAILURE);
                 }
                 compressMain(fileNameIn);
                 break;
             case 2 :
-                // Recuperation du nom de file a ouvrir
-                if(argc==2 && (strlen(argv[1])<FILENAME_MAX))// si la size de la string est correcte pour etre copie dans fileNameIn et s'il y a 2 arguments, car le premier est toujours le nom de l'executable
+                // Getting the name of the file that we will open
+                if(argc==2 && (strlen(argv[1])<FILENAME_MAX))// If the size of the string is correct to get copied in fileNameIn and if there are only 2 arguments (the executable and the name of the file dropped or given)
                     sprintf(fileNameIn, "%s", argv[1]);
                 else{
                     getFileName(fileNameIn);
                 }
 
-                if(!strcmp(fileNameIn, "table.txt")){ // le file d'entree ne doit pas avoir le meme nom que d'autres files utilises dans le programme
-                    fprintf(stderr, "ERREUR : Le nom du file doit etre different de table.txt");
+                if(!strcmp(fileNameIn, "table.txt")){ // The input file can't have the same name of other files used in this program
+                    fprintf(stderr, "ERROR : Le nom du file doit etre different de table.txt");
                     exit(EXIT_FAILURE);
                 }
                 decompressMain(fileNameIn);
                 break;
             default :
-                fprintf(stderr, "ERREUR : Choix incorrect");
+                fprintf(stderr, "ERROR : Incorrect choice");
                 exit(EXIT_FAILURE);
         }
     }

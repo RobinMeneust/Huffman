@@ -1,6 +1,6 @@
 /**
  * \file HuffmanTableCreation.c
- * \brief Permet la creation de la table de codage Huffman, qui sera enregistree dans un file a partir duquel sera faite la compression et la decompression.
+ * \brief Used to create the Huffman table that will be saved in a file used to compress and decompress the associated file
  * \author Robin Meneust
  * \date 2021
 */
@@ -12,9 +12,9 @@
 
 /**
  * \fn PtrlistCode createNode(unsigned char c)
- * \brief Creer un nouveau node pour une liste de type listCode
- * \param c Caractere du node a creer
- * \return node cree
+ * \brief Creates a new node for a listCode type linked list
+ * \param c Character contained in the newly created node
+ * \return Created node
 */
 
 PtrlistCode createNode(unsigned char c)
@@ -22,7 +22,7 @@ PtrlistCode createNode(unsigned char c)
     listCode *node = NULL;
     node= (listCode*) malloc(sizeof(listCode));
     TESTALLOC(node);
-    node->valeur = c;
+    node->value = c;
     node->next = NULL;
     return node;
 }
@@ -30,9 +30,9 @@ PtrlistCode createNode(unsigned char c)
 
 /**
  * \fn void addStartList(PtrlistCode *liste, PtrlistCode node)
- * \brief Ajoute un node en tete d'une liste de type listCode donnee en parametre
- * \param liste Pointeur vers la tete d'une liste listCode dans laquelle la fonction insere le node
- * \param node node a inserer
+ * \brief Adds a node at the beginning of a given listCode type linked list
+ * \param liste Pointer to the head of the give nlist
+ * \param node Inserted node
 */
 
 void addStartList(PtrlistCode *liste, PtrlistCode node)
@@ -49,10 +49,10 @@ void addStartList(PtrlistCode *liste, PtrlistCode node)
 
 /**
  * \fn void initializeCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable,OccurrencesArrayCell* occurrencesArray)
- * \brief Initialise toutes les listes du champ code d'un tableau de type HuffmanTableCell
- * \param huffmanTable Tableau dont il faut initialiser les listes
- * \param sizeHuffmanTable size du tableau dynamique huffmanTable
- * \param occurrencesArray Tableau de structures contenant chaque caractere associe a son nombre d'occurrence
+ * \brief Initializes all the lists of the field code of a HuffmanTableCell type array
+ * \param huffmanTable Array that is being initialized
+ * \param sizeHuffmanTable Size of the dynamic array huffmanTable
+ * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
 */
 
 
@@ -67,10 +67,10 @@ void initializeCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable,Occurren
 
 /**
  * \fn OccurrencesArrayCell* rempliroccurrencesArray(FILE* file,int* occurrencesArraySize)
- * \brief Fonction allouant et initialisant le tableau occurrencesArray associant chaque caractere a son nombre d'occurrences
- * \param buffer Buffer a partir duquel cette fonction remplit le tableau donne en parametre
- * \param occurrencesArraySize size du tableau dynamique occurrencesArray(ici t_return), est incremente pendant que le tableau est construit
- * \return Tableau de structures OccurrencesArrayCell contenant chaque caractere associe a son nombre d'occurrence
+ * \brief Allocates and initializes occurrencesArray that associate each character to its number of occurrences
+ * \param buffer Buffer used to fill the array occurrencesArray
+ * \param occurrencesArraySize Size of the dynamic array occurrencesArray(t_return here), it's incremented while the array is created
+ * \return Array of structures containing each character associated to its number of occurrences in the initial file
 */
 
 
@@ -109,11 +109,11 @@ OccurrencesArrayCell* rempliroccurrencesArray(FileBuffer buffer,int* occurrences
 
 /**
  * \fn void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray,int occurrencesArraySize)
- * \brief Cherche les 2 elements du tableau occurrencesArray donnee en entree avec le champ occurrences minimal (les moins frequents)
- * \param i_min1 pointeur vers l'index du 1er minimum du champ occurrence du tableau
- * \param i_min2 pointeur vers l'index du 2e minimum du champ occurrence du tableau
- * \param occurrencesArray Tableau de structures contenant chaque caractere associe a son nombre d'occurrence
- * \param occurrencesArraySize size du tableau dynamique occurrencesArray
+ * \brief Seeks the 2 elements of occurrencesArray with the field occurrences with the 2 lowest values (the rarest ones)
+ * \param i_min1 Pointer to the index of the first minimum of the field occurrences
+ * \param i_min2 Pointer to the index of the second minimum of the field occurrences
+ * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
+ * \param occurrencesArraySize Size of the dynamic array occurrencesArray
 */
 
 
@@ -133,11 +133,11 @@ void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray,i
 
 /**
  * \fn void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray,int* occurrencesArraySize)
- * \brief Fusionne 2 cases d'un tableau de structures OccurrencesArrayCell, decale la suite du tableau sur la case copiee et realloue pour diminuer la size du tableau
- * \param i_min1 l'index du 1er minimum du champ occurrence du tableau
- * \param i_min2 l'index du 2e minimum du champ occurrence du tableau
- * \param occurrencesArray Tableau de structures contenant chaque caractere associe a son nombre d'occurrence
- * \param occurrencesArraySize size du tableau dynamique occurrencesArray
+ * \brief Merges 2 cells of occurrencesArray, shift the rest of the array and switch the cell i_min2 with the last cell of the array and reallocate to reduce the size of the array
+ * \param i_min1 Pointer to the index of the first minimum of the field occurrences
+ * \param i_min2 Pointer to the index of the second minimum of the field occurrences
+ * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
+ * \param occurrencesArraySize Size of the dynamic array occurrencesArray
 */
 
 void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray,int* occurrencesArraySize)
@@ -162,12 +162,12 @@ void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray,int* o
 
 /**
  * \fn void fillHuffmanTableCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2)
- * \brief Remplit les cases de la huffmanTable correspondantes aux caracteres contenus dans le champ c de tabOcurrences pour les cases i_min1 et i_min2 avec 0 ou 1
- * \param huffmanTable Tableau de structures HuffmanTableCell contenant tous les caracteres associes a une liste de 0 ou de 1 selon leur occurrence dans le text
- * \param sizeHuffmanTable size du tableau dynamique huffmanTable
- * \param occurrencesArray Tableau de structures contenant chaque caractere associe a son nombre d'occurrence
- * \param i_min1 l'index du 1er minimum du champ occurrence du tableau
- * \param i_min2 l'index du 2e minimum du champ occurrence du tableau
+ * \brief Fills the cells of huffmanTable that correpond to the characters contained in the field c of tabOcurrences for the cells i_min1 and i_min2 with 0 or 1
+ * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
+ * \param sizeHuffmanTable Size of the dynamic array huffmanTable
+ * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
+ * \param i_min1 Pointer to the index of the first minimum of the field occurrences
+ * \param i_min2 Pointer to the index of the second minimum of the field occurrences
 */
 
 
@@ -197,9 +197,9 @@ void fillHuffmanTableCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable, O
 
 /**
  * \fn void freeHuffmanTable(HuffmanTableCell* huffmanTable,int sizeHuffmanTable)
- * \brief Libere la memoire occupee par la huffmanTable y compris ses listes (du champ code)
- * \param huffmanTable Tableau de structures HuffmanTableCell contenant tous les caracteres associes a une liste de 0 ou de 1 selon leur occurrence dans le text
- * \param sizeHuffmanTable size du tableau dynamique huffmanTable
+ * \brief Frees the memory used by huffmanTable and its linked lists (of the field code)
+ * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
+ * \param sizeHuffmanTable Size of the dynamic array huffmanTable
 */
 
 
@@ -218,8 +218,8 @@ void freeHuffmanTable(HuffmanTableCell* huffmanTable,int sizeHuffmanTable)
 
 /**
  * \fn void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray,int occurrencesArraySize)
- * \brief Libere la memoire occupee par la occurrencesArray y compris ses tableaux dynamiques (du champ c)
- * \param occurrencesArray Tableau de structures OccurrencesArrayCell contenant tous les caracteres associes a un nombre d'occurrences dans le text
+ * \brief Frees the memory used by occurrencesArray and its dynamic arrays (of the field c)
+ * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
  * \param occurrencesArraySize size du tableau dynamique occurrencesArray
 */
 
@@ -235,12 +235,12 @@ void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray,int occurrences
 
 /**
  * \fn void saveTable(int indexBW HuffmanTableCell* huffmanTable,int sizeHuffmanTable, int fileSize, unsigned char option)
- * \brief Enregistre la table de codage dans un file text
- * \param indexBW index permettant de decoder le text BW
- * \param huffmanTable Tableau de structures HuffmanTableCell contenant tous les caracteres associes a une liste de 0 ou de 1 selon leur occurrence dans le text
- * \param sizeHuffmanTable size du tableau dynamique huffmanTable
- * \param fileSize Nombre de caracteres du file a compress
- * \param option Contient 0 si on ne doit pas appliquer BW et MTF ou 1 si on doit le faire
+ * \brief Saves the Huffman coding table in a text file
+ * \param indexBW Index used to decode a file on which Burrows Wheeler was used
+ * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
+ * \param sizeHuffmanTable Size of the dynamic array huffmanTable
+ * \param fileSize Number of characters in the initial uncompressed file
+ * \param option Contains 0 if we should not apply BW and MTF or 1 if we should.
 */
 
 
@@ -256,7 +256,7 @@ void saveTable(int indexBW, HuffmanTableCell* huffmanTable,int sizeHuffmanTable,
         fputc(huffmanTable[i].c, fileTable);
         printf("TEST : i:%d     c   %c:%d\n", i, huffmanTable[i].c, huffmanTable[i].c);
         while(l!=NULL){
-            fputc(l->valeur, fileTable);
+            fputc(l->value, fileTable);
             l = l->next;
         }
         fputc('\n', fileTable);
@@ -268,10 +268,10 @@ void saveTable(int indexBW, HuffmanTableCell* huffmanTable,int sizeHuffmanTable,
 
 /**
  * \fn void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option)
- * \brief Fonction creant, remplissant et sauvegardant la huffmanTable associant chaque caracteres present dans le file a un nombre en binaire
- * \param indexBW index permettant de decoder le text BW
- * \param bufferIn Buffer dont on cree la table
- * \param option Contient 0 si on ne doit pas appliquer BW et MTF ou 1 si on doit le faire
+ * \brief Creates, fills and saves huffmanTable that associate each character of bufferIn to a binary code
+ * \param indexBW Index used to decode a file on which Burrows Wheeler was used
+ * \param bufferIn Buffer from which we create the table associated
+ * \param option Contains 0 if we should not apply BW and MTF or 1 if we should.
 */
 
 void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option)
@@ -285,7 +285,7 @@ void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option)
     TESTALLOC(huffmanTable);
     initializeCode(huffmanTable,sizeHuffmanTable,occurrencesArray);
 
-    while(occurrencesArraySize>1){  // Jusqu'a qu'il ne reste plus qu'un element
+    while(occurrencesArraySize>1){  // Until there is only one element left
         int i_min1 = 0;
         int i_min2 = 1;
         if (occurrencesArray[i_min2].occurrences < occurrencesArray[i_min1].occurrences){

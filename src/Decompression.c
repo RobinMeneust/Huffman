@@ -11,7 +11,7 @@
 
 /**
  * \fn int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
- * \brief Initialize possibleElementsArray so that only cells asociated to characters that exist in fileTable are equal to 1 (and the others to 0)
+ * \brief Initializes possibleElementsArray so that only cells asociated to characters that exist in fileTable are equal to 1 (and the others to 0)
  * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
  * \param fileTable File containing the Huffman table (characters associated to their unique binary code)
  * \return Amount of non-null cells
@@ -40,7 +40,7 @@ int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
 
 /**
  * \fn unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
- * \brief Seek the first index corresponding to a non-null cell in the given array
+ * \brief Seeks the first index corresponding to a non-null cell in the given array
  * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
  * \return First non-null index (which is also a character) of possibleElementsArray
 */
@@ -59,7 +59,7 @@ unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
 
 /**
  * \fn refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8_t bit, int position, int* nbElements)
- * \brief Refresh possibleElementsArray depending the bit and the position given (by comparing the value of the bit at this position in the table to this bit)
+ * \brief Refreshes possibleElementsArray depending the bit and the position given (by comparing the value of the bit at this position in the table to this bit)
  * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
  * \param table File containing the Huffman table (characters associated to their unique binary code)
  * \param bit Bit given, compared to the binary value at the given position in the table
@@ -162,7 +162,7 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
 
 /**
  * \fn void decompressMain(char* fileNameIn)
- * \brief Main function for decompression : call required functions to the decompression of the file whose name is given to the function
+ * \brief Main function for decompression : calls required functions to the decompression of the file whose name is given to the function
  * \param fileNameIn Name of the file that is being decompressed
 */
 

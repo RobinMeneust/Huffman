@@ -1,6 +1,6 @@
 /**
  * \file BurrowsWheeler.c
- * \brief Apply Burrows Wheeler to the given file (encode) or apply its inverse to get back the initial file (decode)
+ * \brief Applies Burrows Wheeler to the given file (encode) or apply its inverse to get back the initial file (decode)
  * \author Robin Meneust
  * \date 2021
 */
@@ -9,7 +9,7 @@
 #include "../include/FonctionsHuffman.h"
 /**
  * \fn unsigned char ** allocateMatBW(long size)
- * \brief Allocate the square matrix of characters given with its size
+ * \brief Allocates the square matrix of characters given with its size
  * \param size size of the matBW matrix
 */
 
@@ -27,7 +27,7 @@ unsigned char ** allocateMatBW(long size)
 
 /**
  * \fn void freeMatBW(unsigned char** matBW, long size)
- * \brief Free the given square matrix of characters
+ * \brief Frees the given square matrix of characters
  * \param matBW Matrix that we have to free
  * \param size Size of the given matrix
 */
@@ -42,10 +42,9 @@ void freeMatBW(unsigned char** matBW, long size)
 
 
 
-
 /**
  * \fn void shiftedFilling(FILE* fileIn, unsigned char** mat, long size, int position)
- * \brief Fill a line of the matrix matBW with all the content of the initial file, it begins with the character at the index "position" and coontinues until all the content as been enter. If we get to the end of the file without filling all the line then we go back to the beginning of the file
+ * \brief Fills a line of the matrix matBW with all the content of the initial file, it begins with the character at the index "position" and coontinues until all the content as been enter. If we get to the end of the file without filling all the line then we go back to the beginning of the file
  * \param fileIn Initial file that we have to compress
  * \param mat Sorted matrix that we fill
  * \param size Size of matBW
@@ -71,7 +70,7 @@ void shiftedFilling(FILE* fileIn, unsigned char** mat, long size, long position)
 
 /**
  * \fn long sortMat(char** mat, long size)
- * \brief Sort by ascending value each line of the matrix mat, it considers only the first character of each line, and if those 2 characters are equal then we use the next ones to sort the matrix
+ * \brief Sorts by ascending value each line of the matrix mat, it considers only the first character of each line, and if those 2 characters are equal then we use the next ones to sort the matrix
  * \param mat Matrix that we are sorting
  * \param size Size of the given matrix
  * \return Index of the line of the sorted matrix that corresponds to the initial text (used only for compression in older versions of this project)
@@ -127,7 +126,7 @@ void sortMat(unsigned char** mat, long size)
 
 /**
  * \fn void saveBWEncode(FILE* fileBW, unsigned char** matBW, long size, long i0)
- * \brief Save the last column of matWB in the file fileBW
+ * \brief Saves the last column of matWB in the file fileBW
  * \param fileBW File that will contain the result of the application of Burrows Wheeler on the initial file
  * \param matBW Sorted square matrix containing in its last column the text that is being saved in fileBW
  * \param size Size of the matrix matBW
@@ -145,11 +144,11 @@ void saveBWEncode(FILE* fileBW, unsigned char** matBW, long size, long i0)
 
 /**
  * \fn void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, long shift)
- * \brief Decale toutes les colonnes d'une case a droite et remplit la 1re avec le text du file fileBW
- * \param bufferBW Buffer de text genere par cette fonction (c'est le text du fileIn auquel on a applique Burrows Wheeler)
- * \param matBW Matrice carree triee contenant en derniere colonne le text a sauvegarder
- * \param size size de la matrice matBW
- * \param shift Indique le nombre de shifts de colonnes a effectuer(de 0 a size-1)
+ * \brief Shifts all columns of a cell to the right and fills the first one with le content of fileBW vertically
+ * \param bufferBW Buffer filled int this function
+ * \param matBW Sorted square matrix that will be used to decode Burrows Wheeler
+ * \param size Size of matBW
+ * \param shift Gives the number of column shifts that has to be done (between 0 and size-1)
 */
 
 void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, long shift)
@@ -168,7 +167,7 @@ void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, l
 
 /**
  * \fn void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
- * \brief Save in a file the text obtained after applying the inverse of Burrows Wheeler (decode)
+ * \brief Saves in a file the text obtained after applying the inverse of Burrows Wheeler (decode)
  * \param fileBWDecode File filled by this function, it's the content of the initial file before applying Burrows Wheeler
  * \param matBW Sorted square matrix containing in its last coluln the text saved here
  * \param size Size of the matrix matBW
@@ -187,7 +186,7 @@ void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
 
 /**
  * \fn void rotationSort(unsigned char* tabChar,int* indexes, int size)
- * \brief Sort the array of indexes to get the encoded text, it reads the array tabChar by reading from the indexes of the array indexes
+ * \brief Sorts the array of indexes to get the encoded text, it reads the array tabChar by reading from the indexes of the array indexes
  * \param tabChar Array containing a string whose cells will be sorted in the array indexes by this function
  * \param indexes Array of the tabChar indexes
  * \param size Size of the arrays tabChar and indexes
@@ -225,7 +224,7 @@ void rotationSort(unsigned char* tabChar,int* indexes, int size)
 
 /**
  * \fn int burrowsWheeler(FileBuffer* bufferIn)
- * \brief Apply Burrows Wheeler to bufferIn
+ * \brief Applies Burrows Wheeler to bufferIn
  * \param bufferIn Buffer on which is applied Burrows Wheeler
  * \return Index used to decode the text encoded with Burrows Wheeler
 */
@@ -268,7 +267,7 @@ int burrowsWheeler(FileBuffer* bufferIn)
 
 /**
  * \fn void burrowsWheelerDecode(FileBuffer bufferIn, FILE* fileBWDecode)
- * \brief Apply the inverse of Burrows-Wheeler to bufferIn and save it in fileBWDecode
+ * \brief Applies the inverse of Burrows-Wheeler to bufferIn and save it in fileBWDecode
  * \param indexBW Index used to decode the text encoded with Burrows Wheeler
  * \param bufferInBuffer Buffer on which is applied the inverse of Burrows Wheeler Buffer
  * \param fileBWDecode File in which is saved the result
