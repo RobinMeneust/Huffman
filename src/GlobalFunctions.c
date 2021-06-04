@@ -51,10 +51,6 @@ int seekStringSize(char * string)
 }
 
 
-
-
-
-
 /**
  * \fn void bufferToFile(FileBuffer buffer,FILE* file)
  * \brief Ecrit le contenu du buffer dans le file

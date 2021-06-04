@@ -214,7 +214,7 @@ void rotationSort(unsigned char* tabChar,int* indexes, int size)
         int tmp = indexes[min];
         indexes[min] = indexes[i];
         indexes[i] = tmp;
-        if(progress+5<((i+1)*100)/size) //Affiche l'etat d'anvancement de la tache
+        if(progress+5<((i+1)*100)/size) //Display the progress of the current task
         {
             progress=(int)((((i+1)*100)/size)/5)*5;
             printf("%d%%\n",progress);
@@ -284,7 +284,7 @@ void burrowsWheelerDecode(int indexBW, FileBuffer bufferIn, FILE* fileBWDecode)
         sortMat(matBW, size);
         if(progress+5<((i+1)*100)/size)
         {
-            progress=(int)((((i+1)*100)/size)/5)*5; //Affiche l'etat d'anvancement de la tache
+            progress=(int)((((i+1)*100)/size)/5)*5; //Display the progress of the current task
             printf("%d%%\n", progress);
         }
     }
