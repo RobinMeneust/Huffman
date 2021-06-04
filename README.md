@@ -1,5 +1,5 @@
 # Codage Huffman
-Projet codé en C
+Projet écrit en C
 
 Compresse ou décompresse des fichiers en utilisant le codage Huffman
 
