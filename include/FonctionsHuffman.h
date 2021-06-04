@@ -51,7 +51,7 @@ void decompressMain();
 unsigned char ** allocateMatBW(long size);
 void freeMatBW(unsigned char** matBW, long size);
 void shiftedFilling(FILE* fileIn, unsigned char** matBW, long size, long position);
-void sortMat(unsigned char** matBW, long size);
+long sortMat(unsigned char** matBW, long size);
 void saveBWEncode(FILE* fileBW, unsigned char** matBW, long size, long i0);
 void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, long shift);
 void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0);

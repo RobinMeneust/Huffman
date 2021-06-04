@@ -76,7 +76,7 @@ void shiftedFilling(FILE* fileIn, unsigned char** mat, long size, long position)
  * \return Index of the line of the sorted matrix that corresponds to the initial text (used only for compression in older versions of this project)
 */
 
-void sortMat(unsigned char** mat, long size)
+long sortMat(unsigned char** mat, long size)
 {
     long i0=0;
     long j=0;
