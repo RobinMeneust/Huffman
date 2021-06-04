@@ -1,7 +1,7 @@
 # Huffman Coding
 Project written in C
 
-Compresses or decompresses files using Huffman coding
+Compresses or decompresses files using Huffman coding and also Burrows Wheeler with Move To Front (when the file is small)
 
 
 
