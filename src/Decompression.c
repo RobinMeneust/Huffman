@@ -1,6 +1,6 @@
 /**
  * \file Decompression.c
- * \brief Decompresse le file file "compresse.bin" en utilisant la table de codage table.txt precedemment creee.
+ * \brief Decompress the file given by the user by using the previously created coding table table.txt
  * \author Robin Meneust
  * \date 2021
 */
@@ -11,10 +11,10 @@
 
 /**
  * \fn int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
- * \brief Initialise le tableau possibleElementsArray pour que seules les cases associees aux caracteres presents dans la fileTable soient a 1 (et les autres a 0)
- * \param possibleElementsArray Tableau contenant les caracteres associes a 1 (s'ils correspondent au code) ou a 0 (dans l'autre cas)
- * \param fileTable file contenant la table Huffman (caracteres associes a leur code binaire)
- * \return Nombre de cases non nulles
+ * \brief Initialize possibleElementsArray so that only cells asociated to characters that exist in fileTable are equal to 1 (and the others to 0)
+ * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
+ * \param fileTable File containing the Huffman table (characters associated to their unique binary code)
+ * \return Amount of non-null cells
 */
 
 int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
@@ -40,9 +40,9 @@ int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
 
 /**
  * \fn unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
- * \brief Recherche le premier index correspondant a une case non nulle dans le tableau donne en parametre
- * \param possibleElementsArray Tableau d'entier de N_ASCII cases
- * \return Premier index du tableau possibleElementsArray (caractere) donc la valeur associee est non nulle
+ * \brief Seek the first index corresponding to a non-null cell in the given array
+ * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
+ * \return First non-null index (which is also a character) of possibleElementsArray
 */
 
 
@@ -53,15 +53,15 @@ unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
             return i;
         }
     }
-    printf("ERREUR : tableau n'ayant auncun element non nul");
+    printf("ERROR : Array without any non-null value");
     exit(EXIT_FAILURE);
 }
 
 /**
  * \fn refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8_t bit, int position, int* nbElements)
- * \brief Actualise le tableau possibleElementsArray en fonction du bit et de la position etudies (en comparant les valeurs du file table a ce bit)
- * \param possibleElementsArray Tableau contenant les caracteres associes a 1 (s'ils correspondent au code) ou a 0 (dans l'autre cas)
- * \param table file contenant la table Huffman (caracteres associes a leur code binaire)
+ * \brief Refresh possibleElementsArray ac fonction du bit et de la position etudies (en comparant les valeurs du file table a ce bit)
+ * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
+ * \param table File containing the Huffman table (characters associated to their unique binary code)
  * \param bit Bit etudie, a comparer a la valeur binaire a la position etudiee dans le file table
  * \param position Position du code etudiee dans le file table, nombre positif, 0 correspond a la 1re valeur du code d'une line et plus ce nombre est grand plus on se deplace a droite
  * \param nbElements Nombre de cases de possibleElementsArray non nulles
@@ -102,13 +102,13 @@ void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8
  * \brief Decompresse le fileIn a partir du file table.txt
  * \param fileIn file text initial a decompress
  * \param bufferOut Buffer decompresse genere par cette fonction
- * \param fileTable file contenant la table Huffman
+ * \param fileTable File containing the Huffman table (characters associated to their unique binary code)
 */
 
 
 void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
 {
-    int fileSizeEntree = readNumberLine(fileTable, 2);
+    int sizeFileIn = readNumberLine(fileTable, 2);
     int nbAjouts=0; // nombre de caracteres decompresses
     uint8_t buffer=0;
     uint8_t bit;
@@ -118,15 +118,15 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
     int possibleElementsArrayPossibles[N_ASCII];  // contient 0 ou 1 : 1 = la sequence correspond et 0 sinon
     int nbElementsPossibles = N_ASCII;
     int pos=0;
-    bufferOut->text = (unsigned char*) malloc(sizeof(unsigned char)*fileSizeEntree);
-    bufferOut->size=fileSizeEntree;
+    bufferOut->text = (unsigned char*) malloc(sizeof(unsigned char)*sizeFileIn);
+    bufferOut->size=sizeFileIn;
     rewind(fileIn);
     buffer=fgetc(fileIn);
     position=0;
     sizeBuffer=8;
     nbElementsPossibles = initializePossibleElementsArray(possibleElementsArrayPossibles, fileTable);
-    while(nbAjouts<fileSizeEntree && nbElementsPossibles!=0){
-        while(sizeBuffer!=0 && nbElementsPossibles!=0 && nbAjouts<fileSizeEntree){
+    while(nbAjouts<sizeFileIn && nbElementsPossibles!=0){
+        while(sizeBuffer!=0 && nbElementsPossibles!=0 && nbAjouts<sizeFileIn){
             bit = buffer & (1<<(sizeBuffer-1));  // on applique un masque pour recuperer le bit a la position sizeBuffer-1 (entre 2^0 et 2^7)
             if(sizeBuffer>1){
                 bit >>= sizeBuffer-1;  // on decale vers la droite afin d'avoir la valeur etudiee completement a droite (et donc d'avoir bit valant 0 ou 1)
@@ -144,9 +144,9 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
             sizeBuffer--;
         }
 
-        if(progress+5<((nbAjouts+1)*100)/fileSizeEntree)
+        if(progress+5<((nbAjouts+1)*100)/sizeFileIn)
         {
-            progress=(int)((((nbAjouts+1)*100)/fileSizeEntree)/5)*5; //Affiche l'etat d'anvancement de la tache
+            progress=(int)((((nbAjouts+1)*100)/sizeFileIn)/5)*5; //Display the progress of the current task
             printf("%d%%\n", progress);
         }
 
@@ -210,11 +210,6 @@ void decompressMain(char* fileNameIn)
         getFileName(fileNameIn);
     }
     #endif
-
-
-
-    
-
 
     fileOut = fopen(fileNameIn, "wb+"); 
     TESTFOPEN(fileOut);
