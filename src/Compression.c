@@ -1,6 +1,6 @@
 /**
  * \file Compression.c
- * \brief Compress the file given by the user by using the previously created coding table table.txt
+ * \brief Compresses the file given by the user by using the previously created coding table table.txt
  * \author Robin Meneust
  * \date 2021
 */
@@ -11,7 +11,7 @@
 
 /**
  * \fn void compress(FileBuffer bufferBW, FILE* fileOut)
- * \brief Compress bufferBW by using the Huffman table
+ * \brief Compresses bufferBW by using the Huffman table
  * \param bufferBW Buffer that is being compressed
  * \param fileOut File compressed filled in this function by using the Huffman coding
 */

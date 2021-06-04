@@ -1,6 +1,6 @@
 /**
  * \file Decompression.c
- * \brief Decompress the file given by the user by using the previously created coding table table.txt
+ * \brief Decompresses the file given by the user by using the previously created coding table table.txt
  * \author Robin Meneust
  * \date 2021
 */
@@ -99,7 +99,7 @@ void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8
 
 /**
  * \fn void decompress(FILE* fileIn, FILE* bufferOut, FILE* fileTable)
- * \brief Decompress fileIn in bufferOut by using fileTable
+ * \brief Decompresses fileIn in bufferOut by using fileTable
  * \param fileIn File that is being decompressed
  * \param bufferOut Decompressed buffer filled in this function
  * \param fileTable File containing the Huffman table (characters associated to their unique binary code)
