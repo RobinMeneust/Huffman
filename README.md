@@ -20,16 +20,16 @@ make run
 ````
 Puis suivre les instructions s'affichant à l'écran : donner le nom du fichier avec son chemin...
 
-Ou glisser directement le fichier à compresser sur l'executable
+Il est aussi possible de glisser directement le fichier à compresser sur l'executable
 
 
 ## AUTRE
 
-Le fichier table.txt associé au fichier commpressé est nécessaire pour la décompression, il doit être dans le même dossier que l'exécutable.
-Le fichier à compresser ne doit pas avoir pour nom "table.txt".
-Un fichier vide ne sera pas compressé.
-S'il y a peu de caractères identiques dans le fichier à compresser (ou un seul caractère) la compression sera peu efficace.
-Pour générer la documentation doxygen faites :
+* Le fichier table.txt associé au fichier commpressé est nécessaire pour la décompression, il doit être dans le même dossier que l'exécutable.
+* Le fichier à compresser ne doit pas avoir pour nom "table.txt".
+* Un fichier vide ne sera pas compressé.
+* S'il y a peu de caractères identiques dans le fichier à compresser (ou un seul caractère) la compression sera peu efficace.
+* Pour générer la documentation doxygen faites :
 
 ````
 make doc
