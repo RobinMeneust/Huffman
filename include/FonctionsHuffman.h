@@ -21,7 +21,7 @@ long readNumberLine(FILE* file, long line);
 void wordWrapFile(FILE* file);
 int wordWrapBuffer(FileBuffer buffer);
 int seekSizeOfFile(FILE* file);
-long seekSizeInBuffer(FileBuffer buffer);
+long seekNbFirstLineBuffer(FileBuffer buffer);
 
 //HuffmanTableCreation.c
 PtrlistCode createNode(unsigned char c);

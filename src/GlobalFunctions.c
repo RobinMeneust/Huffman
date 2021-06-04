@@ -1,6 +1,6 @@
 /**
  * \file GlobalFunctions.c
- * \brief Contient des fonctions utilisees plusieurs fois par differentes fonctions.
+ * \brief Contains functions used multiple times by different functions
  * \author Robin Meneust
  * \date 2021
 */
@@ -12,33 +12,30 @@
 
 /**
  * \fn void getFileName(char * fileName)
- * \brief Permet la saisie d'un nom de file
- * \param fileName Nom saisi
+ * \brief Asks the user to give a name for a file
+ * \param fileName Given name
 */
 
 void getFileName(char * fileName)
 {
-    char* positionFinSaisie = NULL;
-    printf("\nNom complet du file a compress ou decompress (avec son extension s'il en a) : ");
+    char* posEndInput = NULL;
+    printf("\nFull name of the file that has to be compressed/decompressed (whith its extension if it has one) : ");
     if(fgets(fileName, FILENAME_MAX, stdin)==NULL){
-        fprintf(stderr, "ERREUR : Probleme lors de la recuperation du nom de file");
+        fprintf(stderr, "ERROR : Issue encountered while getting the name of the file");
         exit(EXIT_FAILURE);
     }
-    positionFinSaisie = strchr(fileName, '\n'); // on cherche la position du carractere \n pour le supprimer du nom de file et qu'il marque la fin de ce dernier
-    if(positionFinSaisie!=NULL){
-        *positionFinSaisie='\0';
+    posEndInput = strchr(fileName, '\n'); // We seek the position of the character \n to delete it from the name of the file by replacing it with '\0'
+    if(posEndInput!=NULL){
+        *posEndInput='\0';
     }
 }
 
 
-
-
-
 /**
  * \fn int seekStringSize(char * string)
- * \brief Donne la size de la string donnee
- * \param string string lue
- * \return size de la string lue
+ * \brief Give the size of the given string
+ * \param string Read string
+ * \return Size of the given string
 */
 
 
@@ -53,9 +50,9 @@ int seekStringSize(char * string)
 
 /**
  * \fn void bufferToFile(FileBuffer buffer,FILE* file)
- * \brief Ecrit le contenu du buffer dans le file
- * \param buffer Buffer lu
- * \param file file ou l'on ecrit le buffer
+ * \brief Write the content of the buffer in the file
+ * \param buffer Buffer read
+ * \param file File in which is written the content of the buffer
 */
 
 void bufferToFile(FileBuffer buffer,FILE* file)
@@ -69,9 +66,9 @@ void bufferToFile(FileBuffer buffer,FILE* file)
 
 /**
  * \fn FileBuffer fileToBuffer(FILE* file)
- * \brief Ecrit un file dans le buffer
- * \param file file lu
- * \return Buffer contenant le file qu'on a charge dedans
+ * \brief Write a file in a buffer
+ * \param file file read
+ * \return Buffer in which is written the content of the file
 */
 
 FileBuffer fileToBuffer(FILE* file)
@@ -90,23 +87,23 @@ FileBuffer fileToBuffer(FILE* file)
 
 /**
  * \fn long readNumberLine(FILE* file, long line)
- * \brief Donne la size contenue dans le beginning (1re line) du file (valeur entiere)
- * \param file file dont on extrait la size
- * \param line line dont on extrait le nombre
- * \return Nombre extrait du file a la line donnee
+ * \brief Give the number contained in the given line of the file read (integer value)
+ * \param file file read
+ * \param line Line of the file that is read
+ * \return Value contained in the line read
 */
 
 long readNumberLine(FILE* file, long line)
 {
     int c;
     long valeur=0;
-    long nblinesLues=0;
+    long nbReadLines=0;
 
     rewind(file);
 
-    while(nblinesLues<line){
+    while(nbReadLines<line){
         wordWrapFile(file);
-        nblinesLues++;
+        nbReadLines++;
     }
 
     while(((c=fgetc(file))!=EOF) && c!='\n'){
@@ -116,21 +113,21 @@ long readNumberLine(FILE* file, long line)
 }
 
 /**
- * \fn long seekSizeInBuffer(FileBuffer buffer)
- * \brief Donne la size contenue dans le beginning (1re line) du buffer (valeur entiere)
- * \param buffer Buffer dont on extrait la size
- * \return size extraite du buffer
+ * \fn long seekNbFirstLineBuffer(FileBuffer buffer)
+ * \brief Give the number contained in the first line of the Buffer read (integer value)
+ * \param buffer Buffer read
+ * \return Value contained in the first line read
 */
 
-long seekSizeInBuffer(FileBuffer buffer)
+long seekNbFirstLineBuffer(FileBuffer buffer)
 {
     return strtol(buffer.text,NULL, 10); // car strtol ne va pas lire \n et apres (car ce n'est pas un chiffre)
 }
 
 /**
  * \fn int wordWrapBuffer(FileBuffer buffer)
- * \brief Passe au beginning de la line nexte du buffer donne en parametre
- * \param buffer Buffer lu
+ * \brief Go to the beginning of the next line in the given buffer
+ * \param buffer Buffer read
 */
 
 int wordWrapBuffer(FileBuffer buffer)
@@ -147,8 +144,8 @@ int wordWrapBuffer(FileBuffer buffer)
 
 /**
  * \fn void wordWrapFile(FILE* file)
- * \brief Passe au beginning de la line nexte du file donne en parametre
- * \param file file lu
+ * \brief Go to the beginning of the next line in the given file
+ * \param file File read
 */
 
 void wordWrapFile(FILE* file)
@@ -159,9 +156,9 @@ void wordWrapFile(FILE* file)
 
 /**
  * \fn long seekSizeOfFile(FILE* file)
- * \brief Fonction donnant le nombre de caracteres du file lu
- * \param file file lu
- * \return Nombre de caracteres total dans le file
+ * \brief Give the number of characters contained in the read file (its size)
+ * \param file File read
+ * \return Size of the file read
 */
 
 int seekSizeOfFile(FILE* file)
