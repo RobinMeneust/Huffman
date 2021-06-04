@@ -1,50 +1,56 @@
-# Codage Huffman
-Projet écrit en C
+# Huffman Coding
+Project written in C
 
-Compresse ou décompresse des files en utilisant le codage Huffman
+Compresses or decompresses files using Huffman coding
 
-## AUTEUR
+
+
+## AUTHOR
 Robin MENEUST
 
+
+
 ## INSTALLATION
-Nécessite la fonction make pour la compilation
+Requires the make function for compilation
+
+
 
 ## COMPILATION
-Utiliser dans la console la commande `make`
+Use the `make` command in the console
+
 
 
 ## EXECUTION
-Directement ouvrir l'executable créé ou utiliser la commande :
+Directly open the created executable or use the command :
 ````
 make run
 ````
-Puis suivre les instructions s'affichant à l'écran : donner le nom du file avec son chemin...
+Then follow the instructions displayed on the screen: give the name of the file with its path...
 
-Il est aussi possible de glisser directement le file à compress sur l'executable
+It's also possible to directly drag the file to be compressed onto the executable
 
 
-## AUTRE
 
-* Le file table.txt associé au file commpressé est nécessaire pour la décompression, il doit être dans le même dossier que l'exécutable.
-* Le file à compress ne doit pas avoir pour nom "table.txt".
-* Un file vide ne sera pas compressé.
-* S'il y a peu de caractères identiques dans le file à compress (ou un seul caractère) la compression sera peu efficace.
-* Pour générer la documentation doxygen faites :
+## OTHER
+
+* The file table.txt associated with the compressed file is required for the decompression, it must be in the same folder as the executable.
+* The file to be compressed must not have the name "table.txt".
+* An empty file will not be compressed.
+* If there are few identical characters in the file to be compressed (or only one character) the compression will be inefficient.
+* To generate the doxygen documentation do :
 
 ````
 make doc
 ````
 
-### SUPRESSION DES .o
+### To remove the .o files you can do the following
 
-#### WINDOWS
-Pour supprimer les .o sous Windows :
+#### Windows
 ````
 make cleanwin
 ````
 
-#### LINUX
-Pour supprimer les .o sous Linux :
+#### Linux
 ````
 make cleanlinux
 ````
