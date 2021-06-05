@@ -11,6 +11,7 @@
  * \fn unsigned char ** allocateMatBW(long size)
  * \brief Allocates the square matrix of characters given with its size
  * \param size size of the matBW matrix
+ * \return Allocated matrix
  */
 
 unsigned char ** allocateMatBW(long size)
@@ -185,17 +186,17 @@ void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
 
 
 /**
- * \fn void rotationSort(unsigned char* tabChar,int* indexes, int size)
+ * \fn void rotationSort(unsigned char* tabChar, int* indexes, int size)
  * \brief Sorts the array of indexes to get the encoded text, it reads the array tabChar by reading from the indexes of the array indexes
  * \param tabChar Array containing a string whose cells will be sorted in the array indexes by this function
  * \param indexes Array of the tabChar indexes
  * \param size Size of the arrays tabChar and indexes
  */
 
-void rotationSort(unsigned char* tabChar,int* indexes, int size)
+void rotationSort(unsigned char* tabChar, int* indexes, int size)
 {
     int progress=0;
-    for(int i=0;i<size-1;i++)
+    for(int i=0; i<size-1; i++)
     {
         int j=i+1;
         int min=i;
@@ -216,7 +217,7 @@ void rotationSort(unsigned char* tabChar,int* indexes, int size)
         if(progress+5<((i+1)*100)/size) //Display the progress of the current task
         {
             progress=(int)((((i+1)*100)/size)/5)*5;
-            printf("%d%%\n",progress);
+            printf("%d%%\n", progress);
         }
     }
 }
@@ -234,12 +235,12 @@ int burrowsWheeler(FileBuffer* bufferIn)
     int size = bufferIn->size;
     unsigned char* tabChar=malloc(sizeof(unsigned char)*size);
     int* indexes=malloc(sizeof(int)*size);
-    for(int i=0;i<size;i++)
+    for(int i=0; i<size; i++)
     {
         tabChar[i]=bufferIn->text[i];
         indexes[i]=i;
     }
-    rotationSort(tabChar,indexes,size);
+    rotationSort(tabChar, indexes, size);
     int i=0;
     int beginning=0;
     while(i<size)
@@ -252,7 +253,7 @@ int burrowsWheeler(FileBuffer* bufferIn)
         i++;
     }
 
-    for(int i=0;i<size;i++)
+    for(int i=0; i<size; i++)
     {
         int id = indexes[i]-1;
         if(id==-1)

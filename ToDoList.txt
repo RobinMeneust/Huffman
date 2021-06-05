@@ -1,4 +1,3 @@
-Use unsigned int instead of linked list to contain the table code ?
 Check table syntax
 (Re)use static arrays to create a table without reallocation
 Give the percentage of compression (efficiency)

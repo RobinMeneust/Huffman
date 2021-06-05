@@ -38,7 +38,7 @@ void compress(FileBuffer bufferBW, FILE* fileOut)
             c_table = fgetc(table);
         }
         if(c_table!=c){
-                printf("ERROR : Character not found in the table : %c|%d",c,c);
+                printf("ERROR : Character not found in the table : %c|%d", c, c);
             exit(EXIT_FAILURE);
         }
 

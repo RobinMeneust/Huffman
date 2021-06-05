@@ -190,9 +190,9 @@ void decompressMain(char* fileNameIn)
     printf("opt : %d\n", option);
     FCLOSE(fileTable);
     
-    int fileSizeNameEntree = seekStringSize(fileNameIn);
-    if(fileNameIn[fileSizeNameEntree-4]=='.' && fileNameIn[fileSizeNameEntree-3]=='b' && fileNameIn[fileSizeNameEntree-2]=='i' && fileNameIn[fileSizeNameEntree-1]=='n'){
-        fileNameIn[fileSizeNameEntree-4]='\0';  //The .bin is removed
+    int sizeNameFileIn = seekStringSize(fileNameIn);
+    if(fileNameIn[sizeNameFileIn-4]=='.' && fileNameIn[sizeNameFileIn-3]=='b' && fileNameIn[sizeNameFileIn-2]=='i' && fileNameIn[sizeNameFileIn-1]=='n'){
+        fileNameIn[sizeNameFileIn-4]='\0';  //The .bin is removed
     }
 
     //If the file already exists
@@ -223,7 +223,7 @@ void decompressMain(char* fileNameIn)
     }
     else
     {
-        bufferToFile(buffertext,fileOut);
+        bufferToFile(buffertext, fileOut);
     }
     FCLOSE(fileOut);
     free(buffertext.text);

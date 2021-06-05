@@ -13,7 +13,7 @@
 //GlobalFunctions.c
 void getFileName(char * fileName);
 int seekStringSize(char * string);
-void bufferToFile(FileBuffer buffer,FILE* file);
+void bufferToFile(FileBuffer buffer, FILE* file);
 FileBuffer fileToBuffer(FILE* file);
 long readNumberLine(FILE* file, long line);
 void wordWrapFile(FILE* file);
@@ -25,12 +25,12 @@ long seekNbFirstLineBuffer(FileBuffer buffer);
 PtrlistCode createNode(unsigned char c);
 void addStartList(PtrlistCode *liste, PtrlistCode node);
 void initializeCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray);
-OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* occurrencesArraySize);
-void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray, int occurrencesArraySize);
-void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* occurrencesArraySize);
-void fillHuffmanTableCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
+OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* sizeOccurrencesArray);
+void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
+void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* sizeOccurrencesArray);
+void fillHuffmanTableCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
 void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
-void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int occurrencesArraySize);
+void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
 void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize, unsigned char option);
 void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option);
 
@@ -59,7 +59,7 @@ void burrowsWheelerDecode(int indexBW, FileBuffer bufferIn, FILE* fileBWDecode);
 
 //MoveToFront.c
 int seekChar(unsigned char array[], int size, unsigned char c);
-void shiftCharStart(unsigned char array[],int size, int index);
+void shiftCharStart(unsigned char array[], int size, int index);
 void moveToFrontEncode(FileBuffer *buffer);
 void moveToFrontDecode(FileBuffer *buffer);
 
