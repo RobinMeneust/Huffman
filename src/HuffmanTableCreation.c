@@ -10,60 +10,6 @@
 #include "../include/HuffmanFunctions.h"
 
 
-/**
- * \fn PtrlistCode createNode(unsigned char c)
- * \brief Creates a new node for a listCode type linked list
- * \param c Character contained in the newly created node
- * \return Created node
- */
-
-PtrlistCode createNode(unsigned char c)
-{
-    listCode *node = NULL;
-    node= (listCode*) malloc(sizeof(listCode));
-    TESTALLOC(node);
-    node->value = c;
-    node->next = NULL;
-    return node;
-}
-
-
-/**
- * \fn void addStartList(PtrlistCode *liste, PtrlistCode node)
- * \brief Adds a node at the beginning of a given listCode type linked list
- * \param liste Pointer to the head of the give nlist
- * \param node Inserted node
- */
-
-void addStartList(PtrlistCode *liste, PtrlistCode node)
-{
-    if(*liste!=NULL){
-        node->next = *liste;
-        *liste = node;
-    }
-    else{
-        *liste=node;
-    }
-}
-
-
-/**
- * \fn void initializeCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray)
- * \brief Initializes all the lists of the field code of a HuffmanTableCell type array
- * \param huffmanTable Array that is being initialized
- * \param sizeHuffmanTable Size of huffmanTable
- * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
- */
-
-
-void initializeCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray)
-{
-    for(int i=0; i<sizeHuffmanTable; i++){
-        huffmanTable[i].code=NULL;
-        huffmanTable[i].c=occurrencesArray[i].c[0];
-    }
-}
-
 
 /**
  * \fn OccurrencesArrayCell* fillOccurrencesArray(FILE* file, int* sizeOccurrencesArray)
@@ -79,7 +25,6 @@ OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* sizeOccurrenc
     int car[N_ASCII]={0};
     unsigned char c;
     *sizeOccurrencesArray=0;
-    
     int pos=0;
     while(pos<buffer.size)
     {
@@ -103,6 +48,7 @@ OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* sizeOccurrenc
             array_return[i_return].size=1;
             array_return[i_return].c[0]=i;
             array_return[i_return].occurrences=car[i];
+            array_return[i_return].mergedHead=NULL;
             i_return++;
         }
     }
@@ -156,8 +102,21 @@ void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* 
 }
 
 
+HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, HuffmanTreeNode* rightNode, HuffmanTreeNode* parentNode)
+{
+    HuffmanTreeNode* new_node = (HuffmanTreeNode*) malloc(sizeof(HuffmanTreeNode));
+    TESTALLOC(new_node);
+    new_node->c=c;
+    new_node->left=leftNode;
+    new_node->right=rightNode;
+    new_node->parent=parentNode;
+    return new_node;
+}
+
+
+
 /**
- * \fn void fillHuffmanTableCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2)
+ * \fn void fillHuffmanTree(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2)
  * \brief Fills the cells of huffmanTable that correpond to the characters contained in the field c of tabOcurrences for the cells i_min1 and i_min2 with 0 or 1
  * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
  * \param sizeHuffmanTable Size of the array huffmanTable
@@ -167,49 +126,50 @@ void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* 
  */
 
 
-void fillHuffmanTableCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2)
+void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2)
 {
-    int j;
-    for(int i=0; i<occurrencesArray[i_min1].size; i++){
-        j=0;
-        while(occurrencesArray[i_min1].c[i]!=huffmanTable[j].c && j<sizeHuffmanTable){
-            j++;
-        }
-        if(occurrencesArray[i_min1].c[i]==huffmanTable[j].c)
-            addStartList(&(huffmanTable[j].code), createNode('0'));
+    HuffmanTreeNode * leftNode=NULL;
+    HuffmanTreeNode * rightNode=NULL;
+    HuffmanTreeNode * mergedNode=NULL;
+
+    if(occurrencesArray[i_min1].mergedHead==NULL){  // In this case it's a node that hasn't been merged with another one yet so we have to create it
+        leftNode = createNodeHuff(occurrencesArray[i_min1].c[0], NULL, NULL, NULL);
+    }
+    else{
+        leftNode = occurrencesArray[i_min1].mergedHead;
+    }
+    if(occurrencesArray[i_min2].mergedHead==NULL){
+        rightNode = createNodeHuff(occurrencesArray[i_min2].c[0], NULL, NULL, NULL);
+    }
+    else{
+        rightNode = occurrencesArray[i_min2].mergedHead;
     }
 
-    for(int i=0; i<occurrencesArray[i_min2].size; i++){
-        j=0;
-        while(occurrencesArray[i_min2].c[i]!=huffmanTable[j].c && j<sizeHuffmanTable){
-            j++;
-        }
-        if(occurrencesArray[i_min2].c[i]==huffmanTable[j].c)
-            addStartList(&(huffmanTable[j].code), createNode('1'));
-    }
+    mergedNode=createNodeHuff('\0', leftNode, rightNode, NULL);
+    leftNode->parent= mergedNode;
+    rightNode->parent= mergedNode;
+    occurrencesArray[i_min1].mergedHead = mergedNode;
 }
 
 
-
 /**
- * \fn void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
+ * \fn void freeHuffmanTree(HuffmanTreeNode* huffmanTable)
  * \brief Frees the memory used by huffmanTable and its linked lists (of the field code)
  * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
  * \param sizeHuffmanTable Size of huffmanTable
  */
 
 
-void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
+void freeHuffmanTree(HuffmanTreeNode* huffmanNode)
 {
-    PtrlistCode p = NULL;
-    for(int i=0; i<sizeHuffmanTable; i++){
-        while(huffmanTable[i].code!=NULL){
-            p = huffmanTable[i].code;
-            huffmanTable[i].code = huffmanTable[i].code->next;
-            free(p);
-        }
+    if(huffmanNode==NULL){
+        return;
     }
-    free(huffmanTable);
+    else{
+        freeHuffmanTree(huffmanNode->left);
+        freeHuffmanTree(huffmanNode->right);
+        free(huffmanNode);
+    }
 }
 
 /**
@@ -229,6 +189,30 @@ void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurr
 
 
 
+void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreeHead huffmanNode, int fileSize, int* pos)
+{
+    if(huffmanNode==NULL){
+        fputc('0', file);
+        printf("0");
+        return;
+    }
+    else{
+        if(*pos==fileSize){
+            fprintf(stderr, "\nERROR : fulled buffer in the huffman table creation\n");
+            exit(EXIT_FAILURE);
+        }
+        fputc('1', file);
+        printf("1");
+        if(huffmanNode->left==NULL && huffmanNode->right==NULL){
+            bufferChar[*pos] = huffmanNode->c;
+            printf("\nc : %c|%d\n", bufferChar[*pos], bufferChar[*pos]);
+            (*pos)++;
+        }
+        readNodeHuffmanAndWrite(file, bufferChar, huffmanNode->left, fileSize, pos);
+        readNodeHuffmanAndWrite(file, bufferChar, huffmanNode->right, fileSize, pos);
+    }
+}
+
 /**
  * \fn void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize)
  * \brief Saves the Huffman coding table in a text file
@@ -239,24 +223,21 @@ void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurr
  */
 
 
-void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize)
+void saveTable(int indexBW, HuffmanTreeHead huffmanTable, int fileSize)
 {
+    int pos=0; // Used to write in the buffer bufferChar
     FILE* fileTable = fopen("table.txt", "wb+");
     TESTFOPEN(fileTable);
-    PtrlistCode l=NULL;
     fprintf(fileTable, "%d\n%d\n", indexBW, fileSize);
-    for(int i=0; i<sizeHuffmanTable; i++){
-        l = huffmanTable[i].code;
-        fputc(huffmanTable[i].c, fileTable);
-        while(l!=NULL){
-            fputc(l->value, fileTable);
-            l = l->next;
-        }
-        fputc('\n', fileTable);
-    }
+
+    unsigned char* bufferChar = (unsigned char*) malloc(fileSize*sizeof(unsigned char));
+    TESTALLOC(bufferChar);
+    readNodeHuffmanAndWrite(fileTable, bufferChar, huffmanTable, fileSize, &pos);
+    fputc('\n', fileTable);
+    fwrite(bufferChar, sizeof(unsigned char), fileSize, fileTable);
+
     FCLOSE(fileTable);
 }
-
 
 
 /**
@@ -270,28 +251,24 @@ void createHuffmanTable(int indexBW, FileBuffer bufferIn)
 {
     int sizeOccurrencesArray;
     OccurrencesArrayCell* occurrencesArray = fillOccurrencesArray(bufferIn, &sizeOccurrencesArray);
-
-    int sizeHuffmanTable=sizeOccurrencesArray;
-    HuffmanTableCell* huffmanTable = NULL;
-    huffmanTable = (HuffmanTableCell*) malloc(sizeHuffmanTable*sizeof(HuffmanTableCell));
-    TESTALLOC(huffmanTable);
-    initializeCode(huffmanTable, sizeHuffmanTable, occurrencesArray);
+    int nbUniqueElements=sizeOccurrencesArray;
+    int i_min1;
+    int i_min2;
 
     while(sizeOccurrencesArray>1){  // Until there is only one element left
-        int i_min1 = 0;
-        int i_min2 = 1;
+        i_min1 = 0;
+        i_min2 = 1;
         if (occurrencesArray[i_min2].occurrences < occurrencesArray[i_min1].occurrences){
             int tmp=i_min2;
             i_min2 = i_min1;
             i_min1 = tmp;
         }
         seek2Min(&i_min1, &i_min2, occurrencesArray,sizeOccurrencesArray);
-        fillHuffmanTableCode(huffmanTable, sizeHuffmanTable, occurrencesArray, i_min1, i_min2);
+        fillHuffmanTree(occurrencesArray, i_min1, i_min2);
         merge(i_min1, i_min2, occurrencesArray, &sizeOccurrencesArray);
     }
 
-    saveTable(indexBW, huffmanTable, sizeHuffmanTable, bufferIn.size);
-
-    freeHuffmanTable(huffmanTable, sizeHuffmanTable);
+    saveTable(indexBW, occurrencesArray[i_min1].mergedHead, nbUniqueElements);
+    freeHuffmanTree(occurrencesArray[i_min1].mergedHead);
     freeOccurrencesArray(occurrencesArray, sizeOccurrencesArray);
 }

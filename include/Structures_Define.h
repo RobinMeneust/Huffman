@@ -87,6 +87,23 @@ typedef struct listCode{
 
 typedef listCode* PtrlistCode;
 
+
+/**
+ * \struct H Structures_Define.h
+ * \brief 
+ */
+
+typedef struct HuffmanTreeNode{
+    unsigned char c; /*!< character to which we associate the code*/
+    struct HuffmanTreeNode* left;
+    struct HuffmanTreeNode* right;
+    struct HuffmanTreeNode* parent;
+}HuffmanTreeNode;
+
+typedef HuffmanTreeNode* HuffmanTreeHead;
+
+
+
 /**
  * \struct OccurrencesArrayCell Structures_Define.h
  * \brief Cell of an array associating characters to their number of occurrences and to the size of c : the string containing those characters
@@ -96,16 +113,9 @@ typedef struct OccurrencesArrayCell{
     int occurrences; /*!< number of occurrences of the characters contained in c*/
     unsigned char* c; /*!< string*/
     int size; /*!< size of the string c*/
+    HuffmanTreeHead mergedHead;    
 }OccurrencesArrayCell;
 
-/**
- * \struct HuffmanTableCell Structures_Define.h
- * \brief Cell of an array associating a character to a binary code
- */
 
-typedef struct HuffmanTableCell{
-    unsigned char c; /*!< character to which we associate the code*/
-    PtrlistCode code; /*!< linked list containing the binary code associated to the character c*/
-}HuffmanTableCell;
 
 #endif

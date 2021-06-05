@@ -110,6 +110,7 @@ void compressMain(char* fileNameIn)
     } 
 
     //TABLE CREATION
+    printf("\nTable creation...\n");
     createHuffmanTable(indexBW, buffertext);
 
     //COMPRESSION

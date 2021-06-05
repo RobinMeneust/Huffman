@@ -21,17 +21,17 @@ int seekSizeOfFile(FILE* file);
 long seekNbFirstLineBuffer(FileBuffer buffer);
 
 //HuffmanTableCreation.c
-PtrlistCode createNode(unsigned char c);
-void addStartList(PtrlistCode *liste, PtrlistCode node);
-void initializeCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray);
 OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* sizeOccurrencesArray);
 void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
 void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* sizeOccurrencesArray);
-void fillHuffmanTableCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
-void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
+HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, HuffmanTreeNode* rightNode, HuffmanTreeNode* parentNode);
+void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
+void freeHuffmanTree(HuffmanTreeNode* huffmanNode);
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
-void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize);
+void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreeHead huffmanNode, int fileSize, int* pos);
+void saveTable(int indexBW, HuffmanTreeHead huffmanTable, int fileSize);
 void createHuffmanTable(int indexBW, FileBuffer bufferIn);
+
 
 //Compression.c
 void compress(FileBuffer bufferBW, FILE* fileOut);
