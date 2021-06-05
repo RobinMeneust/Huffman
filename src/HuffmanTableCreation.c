@@ -98,7 +98,7 @@ OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* sizeOccurrenc
     {
         if(car[i]!=0)
         {
-            array_return[i_return].c = (unsigned char*) malloc(sizeof(unsigned char));
+            array_return[i_return].c = (unsigned char*) malloc((*sizeOccurrencesArray) * sizeof(unsigned char));
             TESTALLOC(array_return[i_return].c);
             array_return[i_return].size=1;
             array_return[i_return].c[0]=i;
