@@ -5,4 +5,3 @@ Give the percentage of compression (efficiency)
 SDL ?
 seekStringSize useful ? -> use strlen instead ??
 Use only one character in table.txt to precise if we use or not the extensions (i0=-1 ou i0>=0) ??
-Increase the speed of compression/decompression

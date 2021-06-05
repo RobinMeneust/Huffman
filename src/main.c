@@ -3,16 +3,16 @@
  * \brief Main function of the project. Used to launch the compression or the decompression
  * \author Robin Meneust
  * \date 2021
-*/
+ */
 
 
-#include "../include/FonctionsHuffman.h"
+#include "../include/HuffmanFunctions.h"
 #include "../include/Structures_Define.h"
 
 /**
  * \fn int main(int argc, char *argv[])
  * \brief Main function used to compress or decompress a file given in parameter, and if there isn't one then we ask the user to enter its name
-*/
+ */
 
 int main(int argc, char *argv[])
 {

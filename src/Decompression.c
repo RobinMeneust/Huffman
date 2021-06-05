@@ -6,7 +6,7 @@
 */
 
 #include "../include/Structures_Define.h"
-#include "../include/FonctionsHuffman.h"
+#include "../include/HuffmanFunctions.h"
 
 
 /**
@@ -15,7 +15,7 @@
  * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
  * \param fileTable File containing the Huffman table (characters associated to their unique binary code)
  * \return Amount of non-null cells
-*/
+ */
 
 int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
 {
@@ -43,7 +43,7 @@ int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
  * \brief Seeks the first index corresponding to a non-null cell in the given array
  * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
  * \return First non-null index (which is also a character) of possibleElementsArray
-*/
+ */
 
 
 unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
@@ -65,7 +65,7 @@ unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
  * \param bit Bit given, compared to the binary value at the given position in the table
  * \param position Position of the bit read form the code in the table, positive value corresponding to the first value of a line. The higher this number get, the more we shift to the right
  * \param nbElements Number of non-null cells in possibleElementsArray
-*/
+ */
 
 void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8_t bit, int position, int* nbElements)
 {
@@ -103,7 +103,7 @@ void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8
  * \param fileIn File that is being decompressed
  * \param bufferOut Decompressed buffer filled in this function
  * \param fileTable File containing the Huffman table (characters associated to their unique binary code)
-*/
+ */
 
 
 void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
@@ -164,7 +164,7 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
  * \fn void decompressMain(char* fileNameIn)
  * \brief Main function for decompression : calls required functions to the decompression of the file whose name is given to the function
  * \param fileNameIn Name of the file that is being decompressed
-*/
+ */
 
 
 void decompressMain(char* fileNameIn)

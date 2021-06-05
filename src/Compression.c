@@ -3,10 +3,10 @@
  * \brief Compresses the file given by the user by using the previously created coding table table.txt
  * \author Robin Meneust
  * \date 2021
-*/
+ */
 
 #include "../include/Structures_Define.h"
-#include "../include/FonctionsHuffman.h"
+#include "../include/HuffmanFunctions.h"
 
 
 /**
@@ -14,7 +14,7 @@
  * \brief Compresses bufferBW by using the Huffman table
  * \param bufferBW Buffer that is being compressed
  * \param fileOut File compressed filled in this function by using the Huffman coding
-*/
+  */
 
 void compress(FileBuffer bufferBW, FILE* fileOut)
 {
@@ -82,7 +82,7 @@ void compress(FileBuffer bufferBW, FILE* fileOut)
  * \fn void compressMain(char* fileNameIn)
  * \brief Main function for compression : calls required functions to the decompression of the file whose name is given to the function
  * \param fileNameIn Name of the file that is being compressed
-*/
+ */
 
 void compressMain(char* fileNameIn)
 {

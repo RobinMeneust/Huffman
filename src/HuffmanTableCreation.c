@@ -3,11 +3,11 @@
  * \brief Used to create the Huffman table that will be saved in a file used to compress and decompress the associated file
  * \author Robin Meneust
  * \date 2021
-*/
+ */
 
 
 #include "../include/Structures_Define.h"
-#include "../include/FonctionsHuffman.h"
+#include "../include/HuffmanFunctions.h"
 
 
 /**
@@ -15,7 +15,7 @@
  * \brief Creates a new node for a listCode type linked list
  * \param c Character contained in the newly created node
  * \return Created node
-*/
+ */
 
 PtrlistCode createNode(unsigned char c)
 {
@@ -33,7 +33,7 @@ PtrlistCode createNode(unsigned char c)
  * \brief Adds a node at the beginning of a given listCode type linked list
  * \param liste Pointer to the head of the give nlist
  * \param node Inserted node
-*/
+ */
 
 void addStartList(PtrlistCode *liste, PtrlistCode node)
 {
@@ -53,7 +53,7 @@ void addStartList(PtrlistCode *liste, PtrlistCode node)
  * \param huffmanTable Array that is being initialized
  * \param sizeHuffmanTable Size of the dynamic array huffmanTable
  * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
-*/
+ */
 
 
 void initializeCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable,OccurrencesArrayCell* occurrencesArray)
@@ -71,7 +71,7 @@ void initializeCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable,Occurren
  * \param buffer Buffer used to fill the array occurrencesArray
  * \param occurrencesArraySize Size of the dynamic array occurrencesArray(t_return here), it's incremented while the array is created
  * \return Array of structures containing each character associated to its number of occurrences in the initial file
-*/
+ */
 
 
 OccurrencesArrayCell* rempliroccurrencesArray(FileBuffer buffer,int* occurrencesArraySize)
@@ -114,7 +114,7 @@ OccurrencesArrayCell* rempliroccurrencesArray(FileBuffer buffer,int* occurrences
  * \param i_min2 Pointer to the index of the second minimum of the field occurrences
  * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
  * \param occurrencesArraySize Size of the dynamic array occurrencesArray
-*/
+ */
 
 
 void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray,int occurrencesArraySize)
@@ -138,7 +138,7 @@ void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray,i
  * \param i_min2 Pointer to the index of the second minimum of the field occurrences
  * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
  * \param occurrencesArraySize Size of the dynamic array occurrencesArray
-*/
+ */
 
 void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray,int* occurrencesArraySize)
 {
@@ -168,7 +168,7 @@ void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray,int* o
  * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
  * \param i_min1 Pointer to the index of the first minimum of the field occurrences
  * \param i_min2 Pointer to the index of the second minimum of the field occurrences
-*/
+ */
 
 
 void fillHuffmanTableCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2)
@@ -200,7 +200,7 @@ void fillHuffmanTableCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable, O
  * \brief Frees the memory used by huffmanTable and its linked lists (of the field code)
  * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
  * \param sizeHuffmanTable Size of the dynamic array huffmanTable
-*/
+ */
 
 
 void freeHuffmanTable(HuffmanTableCell* huffmanTable,int sizeHuffmanTable)
@@ -221,7 +221,7 @@ void freeHuffmanTable(HuffmanTableCell* huffmanTable,int sizeHuffmanTable)
  * \brief Frees the memory used by occurrencesArray and its dynamic arrays (of the field c)
  * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
  * \param occurrencesArraySize size du tableau dynamique occurrencesArray
-*/
+ */
 
 
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray,int occurrencesArraySize)
@@ -241,7 +241,7 @@ void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray,int occurrences
  * \param sizeHuffmanTable Size of the dynamic array huffmanTable
  * \param fileSize Number of characters in the initial uncompressed file
  * \param option Contains 0 if we should not apply BW and MTF or 1 if we should.
-*/
+ */
 
 
 void saveTable(int indexBW, HuffmanTableCell* huffmanTable,int sizeHuffmanTable, int fileSize, unsigned char option)
@@ -250,7 +250,6 @@ void saveTable(int indexBW, HuffmanTableCell* huffmanTable,int sizeHuffmanTable,
     TESTFOPEN(fileTable);
     PtrlistCode l=NULL;
     fprintf(fileTable, "%d\n%c\n%d\n", indexBW, option, fileSize);
-    printf("DEB\n\n%c\n%d\n\n", option, fileSize);
     for(int i=0; i<sizeHuffmanTable; i++){
         l = huffmanTable[i].code;
         fputc(huffmanTable[i].c, fileTable);
@@ -271,7 +270,7 @@ void saveTable(int indexBW, HuffmanTableCell* huffmanTable,int sizeHuffmanTable,
  * \param indexBW Index used to decode a file on which Burrows Wheeler was used
  * \param bufferIn Buffer from which we create the table associated
  * \param option Contains 0 if we should not apply BW and MTF or 1 if we should.
-*/
+ */
 
 void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option)
 {

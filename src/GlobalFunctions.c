@@ -3,10 +3,10 @@
  * \brief Contains functions used multiple times by different functions
  * \author Robin Meneust
  * \date 2021
-*/
+ */
 
 #include "../include/Structures_Define.h"
-#include "../include/FonctionsHuffman.h"
+#include "../include/HuffmanFunctions.h"
  
 
 
@@ -14,7 +14,7 @@
  * \fn void getFileName(char * fileName)
  * \brief Asks the user to give a name for a file
  * \param fileName Given name
-*/
+ */
 
 void getFileName(char * fileName)
 {
@@ -36,7 +36,7 @@ void getFileName(char * fileName)
  * \brief Gives the size of the given string
  * \param string Read string
  * \return Size of the given string
-*/
+ */
 
 
 int seekStringSize(char * string)
@@ -53,7 +53,7 @@ int seekStringSize(char * string)
  * \brief Writes the content of the buffer in the file
  * \param buffer Buffer read
  * \param file File in which is written the content of the buffer
-*/
+ */
 
 void bufferToFile(FileBuffer buffer,FILE* file)
 {
@@ -69,7 +69,7 @@ void bufferToFile(FileBuffer buffer,FILE* file)
  * \brief Writes a file in a buffer
  * \param file file read
  * \return Buffer in which is written the content of the file
-*/
+ */
 
 FileBuffer fileToBuffer(FILE* file)
 {
@@ -91,7 +91,7 @@ FileBuffer fileToBuffer(FILE* file)
  * \param file file read
  * \param line Line of the file that is read
  * \return Value contained in the line read
-*/
+ */
 
 long readNumberLine(FILE* file, long line)
 {
@@ -117,7 +117,7 @@ long readNumberLine(FILE* file, long line)
  * \brief Gives the number contained in the first line of the Buffer read (integer value)
  * \param buffer Buffer read
  * \return Value contained in the first line read
-*/
+ */
 
 long seekNbFirstLineBuffer(FileBuffer buffer)
 {
@@ -128,7 +128,7 @@ long seekNbFirstLineBuffer(FileBuffer buffer)
  * \fn int wordWrapBuffer(FileBuffer buffer)
  * \brief Goes to the beginning of the next line in the given buffer
  * \param buffer Buffer read
-*/
+ */
 
 int wordWrapBuffer(FileBuffer buffer)
 {
@@ -146,7 +146,7 @@ int wordWrapBuffer(FileBuffer buffer)
  * \fn void wordWrapFile(FILE* file)
  * \brief Goes to the beginning of the next line in the given file
  * \param file File read
-*/
+ */
 
 void wordWrapFile(FILE* file)
 {
@@ -159,7 +159,7 @@ void wordWrapFile(FILE* file)
  * \brief Gives the number of characters contained in the read file (its size)
  * \param file File read
  * \return Size of the file read
-*/
+ */
 
 int seekSizeOfFile(FILE* file)
 {

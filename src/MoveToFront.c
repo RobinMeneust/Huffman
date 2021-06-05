@@ -3,10 +3,10 @@
  * \brief Applied Move To Front to the given file or applies its inverse
  * \author Robin Meneust
  * \date 2021
-*/
+ */
 
 #include "../include/Structures_Define.h"
-#include "../include/FonctionsHuffman.h"
+#include "../include/HuffmanFunctions.h"
 
 
 /**
@@ -16,7 +16,7 @@
  * \param size Size of the array tab
  * \param c Seeked character
  * \return Index of the character seeked in tab
-*/
+ */
 
 
 int seekChar(unsigned char tab[], int size, unsigned char c)
@@ -40,7 +40,7 @@ int seekChar(unsigned char tab[], int size, unsigned char c)
  * \param tab Array in which we shift the character at the given index
  * \param size Size of the array tab
  * \param index Index of the character that has to be shifted
-*/
+ */
 
 
 void shiftCharStart(unsigned char tab[],int size, int index)
@@ -58,7 +58,7 @@ void shiftCharStart(unsigned char tab[],int size, int index)
  * \fn void moveToFrontEncode(FileBuffer *buffer)
  * \brief Applies Move to front to the given buffer
  * \param buffer Buffer on which is applied MTF
-*/
+ */
 
 void moveToFrontEncode(FileBuffer *buffer)
 {
@@ -78,7 +78,7 @@ void moveToFrontEncode(FileBuffer *buffer)
  * \fn void moveToFrontDecode(FileBuffer *buffer)
  * \brief Applies the inverse of Move To Front to the given buffer
  * \param buffer Buffer on which is applied the inverse of MTF
-*/
+ */
 
 void moveToFrontDecode(FileBuffer *buffer)
 {
