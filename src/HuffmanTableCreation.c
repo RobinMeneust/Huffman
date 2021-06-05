@@ -300,7 +300,7 @@ void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurr
 
 
 
-void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreeHead huffmanNode, int fileSize, int* pos, uint8_t bufferPos, int* filling)
+void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreePtr huffmanNode, int fileSize, int* pos, uint8_t bufferPos, int* filling)
 {
     if(huffmanNode==NULL){
         bufferPos<<=1;
@@ -377,7 +377,7 @@ FileBuffer saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffma
 
 
 
-void saveTree(int indexBW, HuffmanTreeHead huffmanTable, int fileSize)
+void saveTree(int indexBW, HuffmanTreePtr huffmanTable, int fileSize)
 {
     int pos=0; // Used to write in the buffer bufferChar
     int filling=0; // between 0 and 8 : 8=filled

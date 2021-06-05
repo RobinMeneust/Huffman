@@ -120,13 +120,6 @@ void compressMain(char* fileNameIn)
     fileOut = fopen(strncat(fileNameIn, ".bin", 4), "wb+"); // We add a .bin at the end of the name so that the initial file isn't replaced
     TESTFOPEN(fileOut);
     printf("\nCompression...\n");
-/*
-    printf("\n");
-    for(int i=0; i<bufferTable.size; i++){
-        printf("%c", bufferTable.text[i]);
-    }
-    printf("\n");
-*/
 
     compress(buffertext, fileOut, bufferTable);
     printf("\nEnd of compression\n");

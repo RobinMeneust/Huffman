@@ -100,7 +100,7 @@ typedef struct HuffmanTreeNode{
     struct HuffmanTreeNode* parent;
 }HuffmanTreeNode;
 
-typedef HuffmanTreeNode* HuffmanTreeHead;
+typedef HuffmanTreeNode* HuffmanTreePtr;
 
 
 
@@ -126,7 +126,7 @@ typedef struct OccurrencesArrayCell{
     int occurrences; /*!< number of occurrences of the characters contained in c*/
     unsigned char* c; /*!< string*/
     int size; /*!< size of the string c*/
-    HuffmanTreeHead mergedHead;    
+    HuffmanTreePtr mergedHead;    
 }OccurrencesArrayCell;
 
 

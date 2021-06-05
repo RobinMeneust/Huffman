@@ -9,90 +9,90 @@
 #include "../include/HuffmanFunctions.h"
 
 
-/**
- * \fn int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
- * \brief Initializes possibleElementsArray so that only cells asociated to characters that exist in fileTable are equal to 1 (and the others to 0)
- * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
- * \param fileTable File containing the Huffman table (characters associated to their unique binary code)
- * \return Amount of non-null cells
- */
 
-int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
+
+FileBuffer getBufferCharFromTable(FILE* fileTable)
 {
-    int nbElements=0;
-    unsigned char c;
+    
+}
+
+
+
+
+
+HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
+{
+    int posBuffer=0;
+    int sizeBuffer;
+    HuffmanTreePtr currentNode = NULL;
+    HuffmanTreePtr previousNode=NULL;
+    HuffmanTreePtr nextNode=NULL;
+    HuffmanTreePtr head = NULL;
+    uint8_t buffer=0;
+    int stop=0;
+    uint8_t bit=0;
+    uint8_t prevBit=1;
     rewind(fileTable);
     wordWrapFile(fileTable);
     wordWrapFile(fileTable);
-    c=fgetc(fileTable);
-    for(int i=0; i<N_ASCII; i++){
-        possibleElementsArray[i]=0;
-    }
-    while(!feof(fileTable)){
-        possibleElementsArray[c]=1;
-        nbElements++;
-        wordWrapFile(fileTable);
-        c=fgetc(fileTable);
-    }
-    return nbElements;
-}
 
-/**
- * \fn unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
- * \brief Seeks the first index corresponding to a non-null cell in the given array
- * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
- * \return First non-null index (which is also a character) of possibleElementsArray
- */
+    //createNodeHuff(c, left, right, parent);
+    head = createNodeHuff('\0', NULL, NULL, NULL);
+    currentNode = head;
+    while(!feof(fileTable) && !stop){
+        buffer=fgetc(fileTable);
+        sizeBuffer=8;
+        while(sizeBuffer!=0 && !stop){
+            bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
+            if(sizeBuffer>1){
+                bit >>= sizeBuffer-1;  // We shift to the right to get the value wanted completely to the right (and so we get a value equals to 0 or 1)
+            }
+            if(bit==0 && currentNode==head){ // We are at the end of the buffer
+                stop=1;
+            }
+            switch (bit)
+            {
+            case 0 : // We go back to the parent
+                //We go back
+                if(prevBit==1){
+                    currentNode->parent=previousNode;
+                    currentNode->c=bufferChar.text[posBuffer];
+                    posBuffer++;
+                }
+                currentNode->left=NULL;
+                currentNode->right=NULL;
+                previousNode=currentNode;
+                currentNode=currentNode->parent;
+                break;
 
+            case 1 : // We continue to the left (or right if we got back to the parent)
+                if(prevBit==0){ // = We got back to the parent
+                    //We go to the right
+                    nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
+                    currentNode->right = nextNode;
+                    previousNode = currentNode;
+                    currentNode = currentNode->right;
+                }
+                else{
+                    //We go to the left
+                    nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
+                    currentNode->left = nextNode;
+                    previousNode = currentNode;
+                    currentNode = currentNode->left;
+                }
+                break;
 
-unsigned char seekFirstPositiveIndex(int* possibleElementsArray)
-{
-    for(unsigned char i=0; i<N_ASCII; i++){
-        if(possibleElementsArray[i]==1){
-            return i;
+            default :
+                fprintf(stderr, "\nERROR : Huffman tree creation issue\n");
+                exit(EXIT_FAILURE);
+                break;
+            }
+            prevBit=bit;
+            sizeBuffer--;
         }
     }
-    printf("ERROR : Array without any non-null value");
-    exit(EXIT_FAILURE);
+    return head;
 }
-
-/**
- * \fn refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8_t bit, int position, int* nbElements)
- * \brief Refreshes possibleElementsArray depending the bit and the position given (by comparing the value of the bit at this position in the table to this bit)
- * \param possibleElementsArray Array containing the characters associatied to 1 (if they correspond to the code) or to 0 (in the other case)
- * \param table File containing the Huffman table (characters associated to their unique binary code)
- * \param bit Bit given, compared to the binary value at the given position in the table
- * \param position Position of the bit read form the code in the table, positive value corresponding to the first value of a line. The higher this number get, the more we shift to the right
- * \param nbElements Number of non-null cells in possibleElementsArray
- */
-
-void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8_t bit, int position, int* nbElements)
-{
-    rewind(table);
-    wordWrapFile(table);
-    wordWrapFile(table);
-    unsigned char c = fgetc(table);
-    unsigned char c_table;
-    int i=0;
-
-    while(!feof(table)){
-        if(possibleElementsArray[c]!=0){
-            c_table=fgetc(table);
-            i=0;
-            while(i<position && c_table!='\n' && !feof(table)){
-                c_table=fgetc(table);
-                i++;
-            }
-            if(c_table-'0'!=bit){
-                possibleElementsArray[c]=0;
-                (*nbElements)--;
-            }
-        }
-        wordWrapFile(table);
-        c = fgetc(table);
-    }
-}
-
 
 
 /**
@@ -177,11 +177,16 @@ void decompressMain(char* fileNameIn)
     fileTable = fopen("table.txt", "rb");
     TESTFOPEN(fileTable);
 
+    FileBuffer bufferChar = getBufferCharFromTable(fileTable);
+
+    HuffmanTreePtr huffmanTree = createTreeFromFile(fileTable, bufferChar);
+
+    FCLOSE(fileTable);
     indexBW=readNumberLine(fileTable, 0);
 
     printf("\nDecompression...\n");
     FileBuffer buffertext;
-    decompress(fileIn, &buffertext, fileTable);
+    decompress(fileIn, &buffertext, huffmanTree);
     FCLOSE(fileIn);
     FCLOSE(fileTable);
     
