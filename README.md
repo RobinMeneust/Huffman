@@ -31,7 +31,7 @@ It's also possible to directly drag the file to be compressed onto the executabl
 
 
 
-## OTHER
+## MISCELLANEOUS
 
 * The file table.txt associated with the compressed file is required for the decompression, it must be in the same folder as the executable.
 * The file to be compressed must not have the name "table.txt".
