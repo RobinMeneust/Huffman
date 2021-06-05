@@ -105,6 +105,19 @@ typedef HuffmanTreeNode* HuffmanTreeHead;
 
 
 /**
+ * \struct HuffmanTableCell Structures_Define.h
+ * \brief Cell of an array associating a character to a binary code
+ */
+
+typedef struct HuffmanTableCell{
+    unsigned char c; /*!< character to which we associate the code*/
+    PtrlistCode code; /*!< linked list containing the binary code associated to the character c*/
+}HuffmanTableCell;
+
+
+
+
+/**
  * \struct OccurrencesArrayCell Structures_Define.h
  * \brief Cell of an array associating characters to their number of occurrences and to the size of c : the string containing those characters
  */

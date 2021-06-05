@@ -2,6 +2,7 @@ Check table syntax
 SDL ?
 Use larger buffers when writting in files ?
 Reduce table size
+Add docygen comments for newf fcuntions
 
 Use a tree to compress/decompress to speed up the process for big files ? IDEA:
 _______________________________

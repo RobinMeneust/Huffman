@@ -112,16 +112,14 @@ long seekNbFirstLineBuffer(FileBuffer buffer)
  * \param buffer Buffer read
  */
 
-int wordWrapBuffer(FileBuffer buffer)
+void wordWrapBuffer(FileBuffer buffer, int* posIn)
 {
-    int pos=0;
-    unsigned char c = buffer.text[pos];
-    pos++;
-    while(c!='\n' && pos<buffer.size){
-        c = buffer.text[pos];
-        pos++;
+    unsigned char c = buffer.text[*posIn];
+    (*posIn)++;
+    while(c!='\n' && (*posIn)<buffer.size){
+        c = buffer.text[*posIn];
+        (*posIn)++;
     }
-    return pos;
 }
 
 /**

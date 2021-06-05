@@ -16,7 +16,7 @@ void bufferToFile(FileBuffer buffer, FILE* file);
 FileBuffer fileToBuffer(FILE* file);
 long readNumberLine(FILE* file, long line);
 void wordWrapFile(FILE* file);
-int wordWrapBuffer(FileBuffer buffer);
+void wordWrapBuffer(FileBuffer buffer, int* posIn);
 int seekSizeOfFile(FILE* file);
 long seekNbFirstLineBuffer(FileBuffer buffer);
 
@@ -28,13 +28,13 @@ HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, Huff
 void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
 void freeHuffmanTree(HuffmanTreeNode* huffmanNode);
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
-void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreeHead huffmanNode, int fileSize, int* pos);
-void saveTable(int indexBW, HuffmanTreeHead huffmanTable, int fileSize);
-void createHuffmanTable(int indexBW, FileBuffer bufferIn);
+void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreeHead huffmanNode, int fileSize, int* pos, uint8_t bufferPos, int* filling);
+FileBuffer saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize);
+FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn);
 
 
 //Compression.c
-void compress(FileBuffer bufferBW, FILE* fileOut);
+void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable);
 void compressMain(char* fileNameIn);
 
 //Decompression.c

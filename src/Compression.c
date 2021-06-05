@@ -16,33 +16,35 @@
  * \param fileOut File compressed filled in this function by using the Huffman coding
   */
 
-void compress(FileBuffer bufferBW, FILE* fileOut)
+void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
 {
     uint8_t buffer=0;   // Byte used to contain the binary code before being inserted in the file fileOut
     int filling=0;
     int progress=0;
     unsigned char c, c_table;
-    FILE* table = fopen("table.txt", "rb");
-    TESTFOPEN(table);
     rewind(fileOut);
-    int pos=0;
-    while(pos<bufferBW.size){
-        c = bufferBW.text[pos];
-        rewind(table);
-        wordWrapFile(table);
-        wordWrapFile(table);
-        c_table = fgetc(table);
-        while(c_table!=c && !feof(table)){
-            wordWrapFile(table);
-            c_table = fgetc(table);
+    int posIn=0;
+    int posTable=0;
+
+    wordWrapBuffer(bufferTable, &posTable);
+    wordWrapBuffer(bufferTable, &posTable);
+    while(posIn<bufferBW.size){
+        c = bufferBW.text[posIn];
+        c_table = bufferTable.text[posTable];
+        posTable++;
+        while(c_table!=c && posTable<bufferTable.size){
+            wordWrapBuffer(bufferTable, &posTable);
+            c_table = bufferTable.text[posTable];
+            posTable++;
         }
         if(c_table!=c){
-                printf("ERROR : Character not found in the table : %c|%d", c, c);
+            printf("ERROR : Character not found in the table : %c|%d", c, c);
             exit(EXIT_FAILURE);
         }
 
-        c_table = fgetc(table);
-        while(c_table!='\n' && !feof(table)){
+        c_table = bufferTable.text[posTable];
+        posTable++;
+        while(c_table!='\n' && posTable<bufferTable.size){
             switch(c_table){
                 case '0': buffer <<= 1; break;  //We shift bits to the left, then we add the bit (0 here) to the right
                 case '1': buffer <<= 1; buffer|=0b1; break; //We shift bits to the left, then we add the bit (1 here) to the right (ici 1), we use a mask to do so
@@ -53,13 +55,15 @@ void compress(FileBuffer bufferBW, FILE* fileOut)
                 buffer=0;
                 filling=0;
             }
-            c_table = fgetc(table);
+            c_table = bufferTable.text[posTable];
+            posTable++;
         }
-        pos++;
+        posIn++;
+        posTable=0;
 
-        if(progress+5<((pos+1)*100)/bufferBW.size)
+        if(progress+5<((posIn+1)*100)/bufferBW.size)
         {
-            progress=(int)((((pos+1)*100)/bufferBW.size)/5)*5; //Display the progress of the current task
+            progress=(int)((((posIn+1)*100)/bufferBW.size)/5)*5; //Display the progress of the current task
             printf("%d%%\n", progress);
         }
 
@@ -73,7 +77,6 @@ void compress(FileBuffer bufferBW, FILE* fileOut)
         buffer=0;
         filling=0;
     }
-    FCLOSE(table);
 }
 
 
@@ -111,14 +114,23 @@ void compressMain(char* fileNameIn)
 
     //TABLE CREATION
     printf("\nTable creation...\n");
-    createHuffmanTable(indexBW, buffertext);
+    FileBuffer bufferTable = createHuffmanTable(indexBW, buffertext);
 
     //COMPRESSION
     fileOut = fopen(strncat(fileNameIn, ".bin", 4), "wb+"); // We add a .bin at the end of the name so that the initial file isn't replaced
     TESTFOPEN(fileOut);
     printf("\nCompression...\n");
-    compress(buffertext, fileOut);
+/*
+    printf("\n");
+    for(int i=0; i<bufferTable.size; i++){
+        printf("%c", bufferTable.text[i]);
+    }
+    printf("\n");
+*/
+
+    compress(buffertext, fileOut, bufferTable);
     printf("\nEnd of compression\n");
+    
     free(buffertext.text);
     sizeFileOut = seekSizeOfFile(fileOut);
     FCLOSE(fileOut);
