@@ -128,7 +128,7 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
             bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
             if(sizeBuffer>1){
                 bit >>= sizeBuffer-1;  // We shift to the right to get the value wanted completely to the right (and so we get a value equals to 0 or 1)
-            }
+            }   
             refreshPossibleElementsArray(possibleElementsArrayPossibles, fileTable, bit, position, &nbElementsPossibles);
             position++;
             if(nbElementsPossibles==1){ // There is only possibility left, so it's the (decompressed) character that we have to insert
@@ -141,7 +141,6 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
             }
             sizeBuffer--;
         }
-
         if(progress+5<((nbInsertions+1)*100)/sizeFileIn)
         {
             progress=(int)((((nbInsertions+1)*100)/sizeFileIn)/5)*5; //Display the progress of the current task
@@ -153,6 +152,7 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
     }
 
     if(nbElementsPossibles==0){
+        fprintf(stderr, "ERROR : Could not find the code in the table");
         exit(EXIT_FAILURE);
     }
 }
