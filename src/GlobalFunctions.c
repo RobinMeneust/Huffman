@@ -55,12 +55,12 @@ int seekStringSize(char * string)
  * \param file File in which is written the content of the buffer
  */
 
-void bufferToFile(FileBuffer buffer,FILE* file)
+void bufferToFile(FileBuffer buffer, FILE* file)
 {
     rewind(file);
-    for(int i=0;i<buffer.size;i++)
+    for(int i=0; i<buffer.size; i++)
     {
-        fputc(buffer.text[i],file);
+        fputc(buffer.text[i], file);
     }
 }
 
@@ -78,7 +78,7 @@ FileBuffer fileToBuffer(FILE* file)
     buffer.text=malloc(buffer.size*sizeof(unsigned char));
     TESTALLOC(buffer.text);
     rewind(file);
-    for(int i=0;i<buffer.size;i++)
+    for(int i=0; i<buffer.size; i++)
     {
         buffer.text[i]=fgetc(file);
     }
@@ -121,7 +121,7 @@ long readNumberLine(FILE* file, long line)
 
 long seekNbFirstLineBuffer(FileBuffer buffer)
 {
-    return strtol(buffer.text,NULL, 10); // car strtol ne va pas lire \n et apres (car ce n'est pas un chiffre)
+    return strtol(buffer.text, NULL, 10); // car strtol ne va pas lire \n et apres (car ce n'est pas un chiffre)
 }
 
 /**
