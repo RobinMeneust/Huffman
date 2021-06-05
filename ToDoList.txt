@@ -1,6 +1,4 @@
 Check table syntax
-(Re)use static arrays to create a table without reallocation
-Give the percentage of compression (efficiency)
 SDL ?
-seekStringSize useful ? -> use strlen instead ??
-Use only one character in table.txt to precise if we use or not the extensions (i0=-1 ou i0>=0) ??
+Use larger buffers when writting in files ?
+Reduce table size

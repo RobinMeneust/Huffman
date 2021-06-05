@@ -24,7 +24,6 @@ int initializePossibleElementsArray(int* possibleElementsArray, FILE* fileTable)
     rewind(fileTable);
     wordWrapFile(fileTable);
     wordWrapFile(fileTable);
-    wordWrapFile(fileTable);
     c=fgetc(fileTable);
     for(int i=0; i<N_ASCII; i++){
         possibleElementsArray[i]=0;
@@ -72,7 +71,6 @@ void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8
     rewind(table);
     wordWrapFile(table);
     wordWrapFile(table);
-    wordWrapFile(table);
     unsigned char c = fgetc(table);
     unsigned char c_table;
     int i=0;
@@ -108,7 +106,7 @@ void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8
 
 void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
 {
-    int sizeFileIn = readNumberLine(fileTable, 2);
+    int sizeFileIn = readNumberLine(fileTable, 1);
     int nbInsertions=0; // Number of characters that we have to insert (size of the initial uncompressed file)
     uint8_t buffer=0;
     uint8_t bit;
@@ -185,12 +183,9 @@ void decompressMain(char* fileNameIn)
     FileBuffer buffertext;
     decompress(fileIn, &buffertext, fileTable);
     FCLOSE(fileIn);
-    
-    int option=readNumberLine(fileTable, 1);
-    printf("opt : %d\n", option);
     FCLOSE(fileTable);
     
-    int sizeNameFileIn = seekStringSize(fileNameIn);
+    int sizeNameFileIn = strlen(fileNameIn);
     if(fileNameIn[sizeNameFileIn-4]=='.' && fileNameIn[sizeNameFileIn-3]=='b' && fileNameIn[sizeNameFileIn-2]=='i' && fileNameIn[sizeNameFileIn-1]=='n'){
         fileNameIn[sizeNameFileIn-4]='\0';  //The .bin is removed
     }
@@ -213,12 +208,12 @@ void decompressMain(char* fileNameIn)
 
     fileOut = fopen(fileNameIn, "wb+"); 
     TESTFOPEN(fileOut);
-    if(option==1)
+    if(indexBW>=0)
     {
-        printf("\nInverse of Move To Front...\n");
+        printf("\nDecoding Move To Front...\n");
         moveToFrontDecode(&buffertext);
 
-        printf("\nInverse of Burrows Wheeler...\n");
+        printf("\nDecoding Burrows Wheeler...\n");
         burrowsWheelerDecode(indexBW, buffertext, fileOut);
     }
     else

@@ -30,24 +30,6 @@ void getFileName(char * fileName)
     }
 }
 
-
-/**
- * \fn int seekStringSize(char * string)
- * \brief Gives the size of the given string
- * \param string Read string
- * \return Size of the given string
- */
-
-
-int seekStringSize(char * string)
-{
-    int i=0;
-    while(string[i]!='\0')
-        i++;
-    return i;
-}
-
-
 /**
  * \fn void bufferToFile(FileBuffer buffer,FILE* file)
  * \brief Writes the content of the buffer in the file

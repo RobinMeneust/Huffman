@@ -230,22 +230,22 @@ void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurr
 
 
 /**
- * \fn void saveTable(int indexBW HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize, unsigned char option)
+ * \fn void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize)
  * \brief Saves the Huffman coding table in a text file
- * \param indexBW Index used to decode a file on which Burrows Wheeler was used
+ * \param indexBW Index used to know if BW was used (if >=0) and to decode a file on which Burrows Wheeler was used
  * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
  * \param sizeHuffmanTable Size of huffmanTable
  * \param fileSize Number of characters in the initial uncompressed file
- * \param option Contains 0 if we should not apply BW and MTF, or 1 if we should.
  */
 
 
-void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize, unsigned char option)
+void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize)
 {
     FILE* fileTable = fopen("table.txt", "wb+");
     TESTFOPEN(fileTable);
     PtrlistCode l=NULL;
-    fprintf(fileTable, "%d\n%c\n%d\n", indexBW, option, fileSize);
+    fprintf(fileTable, "%d\n%d\n", indexBW, fileSize);
+    printf("INDEX %d\nFILESIZE %d\n", indexBW, fileSize);
     for(int i=0; i<sizeHuffmanTable; i++){
         l = huffmanTable[i].code;
         fputc(huffmanTable[i].c, fileTable);
@@ -261,14 +261,13 @@ void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable
 
 
 /**
- * \fn void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option)
+ * \fn void createHuffmanTable(int indexBW, FileBuffer bufferIn)
  * \brief Creates, fills and saves huffmanTable that associate each character of bufferIn to a binary code
- * \param indexBW Index used to decode a file on which Burrows Wheeler was used
+ * \param indexBW Index used to know if BW was used (if >=0) and to decode a file on which Burrows Wheeler was used
  * \param bufferIn Buffer from which we create the table associated
- * \param option Contains 0 if we should not apply BW and MTF, or 1 if we should.
  */
 
-void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option)
+void createHuffmanTable(int indexBW, FileBuffer bufferIn)
 {
     int sizeOccurrencesArray;
     OccurrencesArrayCell* occurrencesArray = fillOccurrencesArray(bufferIn, &sizeOccurrencesArray);
@@ -292,7 +291,7 @@ void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option)
         merge(i_min1, i_min2, occurrencesArray, &sizeOccurrencesArray);
     }
 
-    saveTable(indexBW, huffmanTable, sizeHuffmanTable, bufferIn.size, option);
+    saveTable(indexBW, huffmanTable, sizeHuffmanTable, bufferIn.size);
 
     freeHuffmanTable(huffmanTable, sizeHuffmanTable);
     freeOccurrencesArray(occurrencesArray, sizeOccurrencesArray);

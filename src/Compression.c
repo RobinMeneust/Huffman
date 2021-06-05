@@ -31,7 +31,6 @@ void compress(FileBuffer bufferBW, FILE* fileOut)
         rewind(table);
         wordWrapFile(table);
         wordWrapFile(table);
-        wordWrapFile(table);
         c_table = fgetc(table);
         while(c_table!=c && !feof(table)){
             wordWrapFile(table);
@@ -89,21 +88,17 @@ void compressMain(char* fileNameIn)
     FILE* fileIn;
     FILE* fileOut;
     long sizeFileIn;
-    int indexBW=-1;
+    long sizeFileOut;
+    int indexBW=-1; // if the value is still -1 when we write it in the table then we won't apply BW and MTF to decompress the file
 
     fileIn = fopen(fileNameIn, "rb");
     TESTFOPEN(fileIn);
     sizeFileIn = seekSizeOfFile(fileIn);
-    unsigned char option=0;
-    if(sizeFileIn<1000)
-    {
-        option=1;
-    }
 
     FileBuffer buffertext=fileToBuffer(fileIn);
     FCLOSE(fileIn);
 
-    if(option==1)
+    if(sizeFileIn<1000)
     {
         //BURROWS WHEELER
         printf("\nBurrows Wheeler...\n");
@@ -115,7 +110,7 @@ void compressMain(char* fileNameIn)
     } 
 
     //TABLE CREATION
-    createHuffmanTable(indexBW, buffertext, option+'0');
+    createHuffmanTable(indexBW, buffertext);
 
     //COMPRESSION
     fileOut = fopen(strncat(fileNameIn, ".bin", 4), "wb+"); // We add a .bin at the end of the name so that the initial file isn't replaced
@@ -123,6 +118,8 @@ void compressMain(char* fileNameIn)
     printf("\nCompression...\n");
     compress(buffertext, fileOut);
     printf("\nEnd of compression\n");
-    FCLOSE(fileOut);
     free(buffertext.text);
+    sizeFileOut = seekSizeOfFile(fileOut);
+    FCLOSE(fileOut);
+    printf("\nSpace saving : %.2f %%\n\n", (1-(((float)sizeFileOut)/sizeFileIn))*100);
 }

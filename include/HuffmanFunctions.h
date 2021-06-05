@@ -12,7 +12,6 @@
 
 //GlobalFunctions.c
 void getFileName(char * fileName);
-int seekStringSize(char * string);
 void bufferToFile(FileBuffer buffer, FILE* file);
 FileBuffer fileToBuffer(FILE* file);
 long readNumberLine(FILE* file, long line);
@@ -31,8 +30,8 @@ void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* 
 void fillHuffmanTableCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
 void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
-void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize, unsigned char option);
-void createHuffmanTable(int indexBW, FileBuffer bufferIn, unsigned char option);
+void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize);
+void createHuffmanTable(int indexBW, FileBuffer bufferIn);
 
 //Compression.c
 void compress(FileBuffer bufferBW, FILE* fileOut);
