@@ -245,7 +245,6 @@ void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable
     TESTFOPEN(fileTable);
     PtrlistCode l=NULL;
     fprintf(fileTable, "%d\n%d\n", indexBW, fileSize);
-    printf("INDEX %d\nFILESIZE %d\n", indexBW, fileSize);
     for(int i=0; i<sizeHuffmanTable; i++){
         l = huffmanTable[i].code;
         fputc(huffmanTable[i].c, fileTable);
