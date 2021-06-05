@@ -5,8 +5,6 @@
  * \date 2021
  */
 
-
-
 #ifndef HuffmanFunctions
 #define HuffmanFunctions
 #include "Structures_Define.h"
@@ -27,7 +25,7 @@ long seekNbFirstLineBuffer(FileBuffer buffer);
 PtrlistCode createNode(unsigned char c);
 void addStartList(PtrlistCode *liste, PtrlistCode node);
 void initializeCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray);
-OccurrencesArrayCell* rempliroccurrencesArray(FileBuffer buffer, int* occurrencesArraySize);
+OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* occurrencesArraySize);
 void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray, int occurrencesArraySize);
 void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* occurrencesArraySize);
 void fillHuffmanTableCode(HuffmanTableCell* huffmanTable,int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
