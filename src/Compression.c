@@ -10,11 +10,12 @@
 
 
 /**
- * \fn void compress(FileBuffer bufferBW, FILE* fileOut)
+ * \fn void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
  * \brief Compresses bufferBW by using the Huffman table
  * \param bufferBW Buffer that is being compressed
  * \param fileOut File compressed filled in this function by using the Huffman coding
-  */
+ * \param bufferTable Buffer in which is saved the Huffman table (characters associated to a binary code)
+ */
 
 void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
 {

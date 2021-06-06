@@ -1,6 +1,6 @@
 /**
  * \file GlobalFunctions.c
- * \brief Contains functions used multiple times by different functions
+ * \brief Contains functions used multiple times by different files
  * \author Robin Meneust
  * \date 2021
  */
@@ -45,6 +45,39 @@ void bufferToFile(FileBuffer buffer, FILE* file)
         fputc(buffer.text[i], file);
     }
 }
+
+
+
+/**
+ * \fn FileBuffer getPortionOfFileToBuffer(FILE* fileTable, int sizeBuff)
+ * \brief Reads a file without starting at the beginning and continue until it has read a certain amount (sizeBuff) of characters. Then it save it in a buffer that is returned
+ * \param file File from which we get the buffer
+ * \param sizeBuff Size of the return buffer. Number of characters read from the file
+ * \return Buffer read from the file
+ */
+
+
+FileBuffer getPortionOfFileToBuffer(FILE* file, int sizeBuff)
+{
+    FileBuffer bufferChar;
+    int c=0;
+    int posBuffer=0;
+    bufferChar.size = sizeBuff;
+    bufferChar.text = (unsigned char*) malloc(bufferChar.size*sizeof(unsigned char));
+
+    c=fgetc(file);
+    while(posBuffer<bufferChar.size && c!=EOF){
+        bufferChar.text[posBuffer]=c;
+        posBuffer++;
+        c=fgetc(file);
+    }
+
+    return bufferChar;
+}
+
+
+
+
 
 /**
  * \fn FileBuffer fileToBuffer(FILE* file)
@@ -95,21 +128,10 @@ long readNumberLine(FILE* file, long line)
 }
 
 /**
- * \fn long seekNbFirstLineBuffer(FileBuffer buffer)
- * \brief Gives the number contained in the first line of the Buffer read (integer value)
+ * \fn void wordWrapBuffer(FileBuffer buffer, int* posIn)
+ * \brief Goes to the beginning of the next line in the given buffer and keep a track of the position in the buffer (posIn)
  * \param buffer Buffer read
- * \return Value contained in the first line read
- */
-
-long seekNbFirstLineBuffer(FileBuffer buffer)
-{
-    return strtol(buffer.text, NULL, 10); // car strtol ne va pas lire \n et apres (car ce n'est pas un chiffre)
-}
-
-/**
- * \fn int wordWrapBuffer(FileBuffer buffer)
- * \brief Goes to the beginning of the next line in the given buffer
- * \param buffer Buffer read
+ * \param posIn Used to read the buffer and to keep a track of the reading position so that the calling function has access to the new position
  */
 
 void wordWrapBuffer(FileBuffer buffer, int* posIn)
@@ -151,6 +173,15 @@ int seekSizeOfFile(FILE* file)
     return size;
 }
 
+/**
+ * \fn HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, HuffmanTreeNode* rightNode, HuffmanTreeNode* parentNode)
+ * \brief Create a node of type HuffmanTreeNode for a binary tree
+ * \param c Character that will be contained in the created node
+ * \param leftNode Left node pointed by the created node
+ * \param rightNode Right node pointed by the created node
+ * \param parentNode Parent node pointed by the created node
+ * \return Newly created node of type HuffmanTreeNode
+ */
 
 HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, HuffmanTreeNode* rightNode, HuffmanTreeNode* parentNode)
 {

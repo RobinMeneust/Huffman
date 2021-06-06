@@ -1,6 +1,13 @@
 Check table syntax
 SDL ?
 Use larger buffers when writting in files ?
+<<<<<<< HEAD
+
+Manage errors
+If indexBW=-1 in table is it well detected/gotten by the decompress function ?
+MTF useful ?
+
+=======
 Reduce table size
 Add doxygen comments for new functions
 Update HuffmanFunctions.h
@@ -8,6 +15,7 @@ Manage errors
 
 
 
+>>>>>>> 4512d3efaa4f09975f62204f0b09cad2690072e8
 _______________________________
 Tree saving method:
 

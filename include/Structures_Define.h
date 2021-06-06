@@ -89,15 +89,15 @@ typedef listCode* PtrlistCode;
 
 
 /**
- * \struct H Structures_Define.h
- * \brief 
+ * \struct HuffmanTreeNode Structures_Define.h
+ * \brief Node of a Huffman tree
  */
 
 typedef struct HuffmanTreeNode{
-    unsigned char c; /*!< character to which we associate the code*/
-    struct HuffmanTreeNode* left;
-    struct HuffmanTreeNode* right;
-    struct HuffmanTreeNode* parent;
+    unsigned char c; /*!< character contained in the node*/
+    struct HuffmanTreeNode* left; /*!< pointer to the left node*/
+    struct HuffmanTreeNode* right; /*!< pointer to the right node*/
+    struct HuffmanTreeNode* parent; /*!< pointer to the parent of this node*/
 }HuffmanTreeNode;
 
 typedef HuffmanTreeNode* HuffmanTreePtr;
@@ -126,7 +126,7 @@ typedef struct OccurrencesArrayCell{
     int occurrences; /*!< number of occurrences of the characters contained in c*/
     unsigned char* c; /*!< string*/
     int size; /*!< size of the string c*/
-    HuffmanTreePtr mergedHead;    
+    HuffmanTreePtr mergedHead; /*!< pointer to a node of a huffman tree, used to create the huffman tree*/
 }OccurrencesArrayCell;
 
 

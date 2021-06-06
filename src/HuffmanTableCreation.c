@@ -1,6 +1,6 @@
 /**
  * \file HuffmanTableCreation.c
- * \brief Used to create the Huffman table that will be saved in a file used to compress and decompress the associated file
+ * \brief Used to create the Huffman table and the Huffman tree that will be saved in a file used to compress and decompress the associated file.
  * \author Robin Meneust
  * \date 2021
  */
@@ -8,8 +8,6 @@
 
 #include "../include/Structures_Define.h"
 #include "../include/HuffmanFunctions.h"
-
-
 
 
 /**
@@ -67,12 +65,6 @@ void initializeCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, Occurr
 }
 
 
-
-
-
-
-
-
 /**
  * \fn OccurrencesArrayCell* fillOccurrencesArray(FILE* file, int* sizeOccurrencesArray)
  * \brief Allocates and initializes occurrencesArray that associate each character to its number of occurrences
@@ -80,7 +72,6 @@ void initializeCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, Occurr
  * \param sizeOccurrencesArray Size of the array occurrencesArray(array_return here), it's incremented while the array is created
  * \return Array of structures containing each character associated to its number of occurrences in the initial file
  */
-
 
 OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* sizeOccurrencesArray)
 {
@@ -224,6 +215,14 @@ void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
 }
 
 
+/**
+ * \fn void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2)
+ * \brief Fill the Huffman tree by creating nodes that are contained in occurrencesArray in the field mergeHead
+ * \param occurrencesArray Array of structures containing each character associated to its number of occurrences in the initial file
+ * \param i_min1 Pointer to the index of the first minimum of the field occurrences
+ * \param i_min2 Pointer to the index of the second minimum of the field occurrences
+ */
+
 
 void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2)
 {
@@ -252,10 +251,9 @@ void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_m
 
 
 /**
- * \fn void freeHuffmanTree(HuffmanTreeNode* huffmanTable)
- * \brief Frees the memory used by huffmanTable and its linked lists (of the field code)
- * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
- * \param sizeHuffmanTable Size of huffmanTable
+ * \fn void freeHuffmanTree(HuffmanTreeNode* huffmanNode)
+ * \brief Recursive function that free the binary tree huffmanNode
+ * \param huffmanNode Huffman tree that is being freed
  */
 
 
@@ -284,7 +282,20 @@ void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurr
 }
 
 
-void readNodeHuffmanAndWrite(FILE* file, FileBuffer* bufferChar, FileBuffer* bufferPos, HuffmanTreePtr huffmanNode, int* posBufferChar, int* posBufferPos, uint8_t *buffer, int* filling)
+
+/**
+ * \fn void readNodeHuffmanAndWrite(FILE* file, FileBuffer* bufferChar, FileBuffer* bufferPos, HuffmanTreePtr huffmanNode, int* posBufferChar, int* posBufferPos, uint8_t *buffer, int* filling)
+ * \brief Recursive function used to fill the buffers needed to save the huffman tree.
+ * \param bufferChar Buffer in which are saved by reading order the characters that will be unzipped during the decompression
+ * \param bufferPos Buffer in which are saved by reading order the the instructions to rebuild the Huffman tree
+ * \param huffmanNode Pointer to a node of the Huffman tree, in the first call of this function it's the root of the tree
+ * \param posBufferChar Position in the buffer bufferChar. Used to write into it
+ * \param posBufferPos Position in the buffer bufferPos. Used to write into it
+ * \param buffer Temporary buffer used to fill bufferPos character by character
+ * \param filling Keep a trace of the state of the buffer "buffer", if its value is 0 then the buffer is empty and if it's 8, it's full
+ */
+
+void readNodeHuffmanAndWrite(FileBuffer* bufferChar, FileBuffer* bufferPos, HuffmanTreePtr huffmanNode, int* posBufferChar, int* posBufferPos, uint8_t *buffer, int* filling)
 {
     if(*posBufferChar==bufferChar->size){
         fprintf(stderr, "\nERROR : Buffer full in the huffman table creation\n");
@@ -334,7 +345,7 @@ void readNodeHuffmanAndWrite(FILE* file, FileBuffer* bufferChar, FileBuffer* buf
 
             //printf(" ");
         }
-        readNodeHuffmanAndWrite(file, bufferChar, bufferPos, huffmanNode->left, posBufferChar, posBufferPos, buffer, filling);
+        readNodeHuffmanAndWrite(bufferChar, bufferPos, huffmanNode->left, posBufferChar, posBufferPos, buffer, filling);
         //printf("1b");
         (*buffer)<<=1; // We add a '1' to the buffer
         (*buffer)|=0b1;
@@ -354,7 +365,7 @@ void readNodeHuffmanAndWrite(FILE* file, FileBuffer* bufferChar, FileBuffer* buf
 
             //printf(" ");
         }
-        readNodeHuffmanAndWrite(file, bufferChar, bufferPos, huffmanNode->right, posBufferChar, posBufferPos, buffer, filling);
+        readNodeHuffmanAndWrite(bufferChar, bufferPos, huffmanNode->right, posBufferChar, posBufferPos, buffer, filling);
         //printf("0b");
         (*buffer)<<=1; // We add a '1' to the buffer
         (*filling)++;
@@ -379,7 +390,16 @@ void readNodeHuffmanAndWrite(FILE* file, FileBuffer* bufferChar, FileBuffer* buf
 }
 
 
-void saveTree(int indexBW, HuffmanTreePtr huffmanTable, int sizeBufferChar, int fileSize)
+/**
+ * \fn void saveTree(int indexBW, HuffmanTreePtr huffmanTree, int sizeBufferChar, int fileSize)
+ * \brief Save the Huffman tree in a file by using 2 buffers, and add at the beginning values used for the decompression
+ * \param indexBW Indicates if the extensions should be used (if > -1) and if it does then it's used to apply the inverse of Burrows Wheeler
+ * \param huffmanTree Pointer to the root of the Huffman tree
+ * \param sizeBufferChar Number of unique elements in the initial file (after the application of the extensions). Size of the buffer bufferChar
+ * \param fileSize Size of the initial file. Used in the decompression
+ */
+
+void saveTree(int indexBW, HuffmanTreePtr huffmanTree, int sizeBufferChar, int fileSize)
 {
     int posBufferChar=0; // Used to write in the buffer bufferChar
     int posBufferPos=0; // // Used to write in the buffer bufferPos
@@ -398,7 +418,7 @@ void saveTree(int indexBW, HuffmanTreePtr huffmanTable, int sizeBufferChar, int 
     TESTFOPEN(fileTable);
 
     // Filling the buffer by reading the tree
-    readNodeHuffmanAndWrite(fileTable, &bufferChar, &bufferPos, huffmanTable, &posBufferChar, &posBufferPos, &buffer, &filling);
+    readNodeHuffmanAndWrite(&bufferChar, &bufferPos, huffmanTree, &posBufferChar, &posBufferPos, &buffer, &filling);
     if(filling>0){
         buffer<<=(8-filling);
         bufferPos.text[posBufferPos]=buffer;
@@ -424,12 +444,10 @@ void saveTree(int indexBW, HuffmanTreePtr huffmanTable, int sizeBufferChar, int 
 
 
 /**
- * \fn void saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize)
- * \brief Saves the Huffman coding table in a text file
- * \param indexBW Index used to know if BW was used (if >=0) and to decode a file on which Burrows Wheeler was used
+ * \fn FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
+ * \brief Saves the Huffman coding table in a buffer
  * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
- * \param sizeHuffmanTable Size of huffmanTable
- * \param fileSize Number of characters in the initial uncompressed file
+ * \param sizeHuffmanTable Number of unique elements in the initial file (after the application of the extensions). Size of the array huffmanTable
  */
 
 

@@ -9,29 +9,13 @@
 #include "../include/HuffmanFunctions.h"
 
 
-
-
-FileBuffer getBufferCharFromTable(FILE* fileTable, int sizeBuff)
-{
-    FileBuffer bufferChar;
-    int c=0;
-    int posBuffer=0;
-    bufferChar.size = sizeBuff;
-    bufferChar.text = (unsigned char*) malloc(bufferChar.size*sizeof(unsigned char));
-
-    c=fgetc(fileTable);
-    while(posBuffer<bufferChar.size && c!=EOF){
-        bufferChar.text[posBuffer]=c;
-        posBuffer++;
-        c=fgetc(fileTable);
-    }
-
-    return bufferChar;
-    
-}
-
-
-
+/**
+ * \fn HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar)
+ * \brief Rebuild a Huffman tree from 2 buffers
+ * \param bufferPos Buffer containing the instructions to navigate in the tree and create its nodes
+ * \param bufferChar Buffer containing the characters that have to be written in the end of the branches of the tree
+ * \return Huffman tree builded from the 2 buffers
+ */
 
 
 HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar)
@@ -110,6 +94,14 @@ HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar
 
 
 
+/**
+ * \fn int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit)
+ * \brief Navigates in the tree by following the instructions of the bit
+ * \param huffmanTreePos Pointer to the current position in the tree
+ * \param bit Binary value used to navigate in the tree. If bit = 0 then we go to the left node, else if bit = 1, we go to the right node
+ * \return Character read from the tree if the current node is the end of a branch, or else we return -1
+ */
+
 
 int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit)
 {
@@ -151,14 +143,13 @@ int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit)
 
 
 
-
-
 /**
- * \fn void decompress(FILE* fileIn, FILE* bufferOut, FILE* fileTable)
- * \brief Decompresses fileIn in bufferOut by using fileTable
+ * \fn void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeHead, int sizeFileIn)
+ * \brief Decompresses fileIn in bufferOut by using huffmanTreeHead and sizeFileIn
  * \param fileIn File that is being decompressed
  * \param bufferOut Decompressed buffer filled in this function
- * \param fileTable File containing the Huffman table (characters associated to their unique binary code)
+ * \param huffmanTreeHead Huffman tree used to unzip fileIn
+ * \param sizeFileIn Size of fileIn. Number of characters that has to be put in bufferOut
  */
 
 
@@ -234,8 +225,8 @@ void decompressMain(char* fileNameIn)
     rewind(fileTable);
     wordWrapFile(fileTable); wordWrapFile(fileTable); wordWrapFile(fileTable); wordWrapFile(fileTable);
     printf("\nFilling buffers from the table...\n");
-    bufferChar = getBufferCharFromTable(fileTable, bufferChar.size);
-    bufferPos = getBufferCharFromTable(fileTable, bufferPos.size);
+    bufferChar = getPortionOfFileToBuffer(fileTable, bufferChar.size);
+    bufferPos = getPortionOfFileToBuffer(fileTable, bufferPos.size);
 
     printf("\nGenerating the huffman tree from the table...\n");
     HuffmanTreePtr huffmanTree = createTreeFromBuffers(bufferPos, bufferChar);
