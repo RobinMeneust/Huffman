@@ -38,39 +38,28 @@ FileBuffer getBufferCharFromTable(FILE* fileTable, int line, int sizeBuff)
 
 
 
-HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
+HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar)
 {
-    int posBuffer=0;
-    int posEndLine=0;
-    int sizeBuffer;
+    int posBufferPos=0;
+    int posBufferChar=0;
     HuffmanTreePtr currentNode = NULL;
     HuffmanTreePtr previousNode=NULL;
     HuffmanTreePtr nextNode=NULL;
     HuffmanTreePtr head = NULL;
     uint8_t buffer=0;
+    int sizeBuffer=0;
     int stop=0;
     uint8_t bit=0;
     uint8_t prevBit=1;
-
-    rewind(fileTable);
-    wordWrapFile(fileTable);
-    wordWrapFile(fileTable);
-    wordWrapFile(fileTable);
-    wordWrapFile(fileTable);
-    posEndLine = ftell(fileTable);
-
-    rewind(fileTable);
-    wordWrapFile(fileTable);
-    wordWrapFile(fileTable);
-    wordWrapFile(fileTable);
 
     //createNodeHuff(c, left, right, parent);
     head = createNodeHuff('\0', NULL, NULL, NULL);
     currentNode = head;
     printf("\n\n");
-    while(ftell(fileTable)!=posEndLine-1 && !stop){
-        buffer=fgetc(fileTable);
-        printf("\nBUFFER    %d|%c\n", buffer, buffer);
+    while(posBufferPos<bufferPos.size && !stop){
+        buffer=bufferPos.text[posBufferPos];
+        posBufferPos++;
+        //printf("\nBUFFER    %d|%c\n", buffer, buffer);
         sizeBuffer=8;
         while(sizeBuffer!=0 && !stop){
             bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
@@ -82,43 +71,43 @@ HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
             }
             switch (bit)
             {
-            case 0 : // We go back to the parent
-                //printf("0");
-                //We go back
-                if(prevBit==1){
-                    currentNode->parent=previousNode;
-                    currentNode->left=NULL;
-                    currentNode->right=NULL;
-                    currentNode->c=bufferChar.text[posBuffer];
-                    //printf("CURRENT NODE c :%d|%c\n", currentNode->c, currentNode->c);
-                    posBuffer++;
-                }
-                previousNode=currentNode;
-                currentNode=currentNode->parent;
-                break;
+                case 0 : // We go back to the parent
+                    //printf("0");
+                    //We go back
+                    if(prevBit==1){
+                        currentNode->parent=previousNode;
+                        currentNode->left=NULL;
+                        currentNode->right=NULL;
+                        currentNode->c=bufferChar.text[posBufferChar];
+                        //printf("CURRENT NODE c :%d|%c\n", currentNode->c, currentNode->c);
+                        posBufferChar++;
+                    }
+                    previousNode=currentNode;
+                    currentNode=currentNode->parent;
+                    break;
 
-            case 1 : // We continue to the left (or right if we got back to the parent)
-                //printf("1");
-                if(prevBit==0){ // = We got back to the parent
-                    //We go to the right
-                    nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
-                    currentNode->right = nextNode;
-                    previousNode = currentNode;
-                    currentNode = currentNode->right;
-                }
-                else{
-                    //We go to the left
-                    nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
-                    currentNode->left = nextNode;
-                    previousNode = currentNode;
-                    currentNode = currentNode->left;
-                }
-                break;
+                case 1 : // We continue to the left (or right if we got back to the parent)
+                    //printf("1");
+                    if(prevBit==0){ // = We got back to the parent
+                        //We go to the right
+                        nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
+                        currentNode->right = nextNode;
+                        previousNode = currentNode;
+                        currentNode = currentNode->right;
+                    }
+                    else{
+                        //We go to the left
+                        nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
+                        currentNode->left = nextNode;
+                        previousNode = currentNode;
+                        currentNode = currentNode->left;
+                    }
+                    break;
 
-            default :
-                fprintf(stderr, "\nERROR : Huffman tree creation issue\n");
-                exit(EXIT_FAILURE);
-                break;
+                default :
+                    fprintf(stderr, "\nERROR : Huffman tree creation issue\n");
+                    exit(EXIT_FAILURE);
+                    break;
             }
             prevBit=bit;
             sizeBuffer--;
@@ -138,34 +127,34 @@ int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit)
             printf("0");
             if((*huffmanTreePos)->left != NULL){
                 (*huffmanTreePos) = (*huffmanTreePos)->left;
-                return -1;
+                if(((*huffmanTreePos)->left == NULL) && ((*huffmanTreePos)->right == NULL)) // We are at the end of a branch
+                    return (*huffmanTreePos)->c;
+                else
+                    return -1;
             }
             else{
-                if((*huffmanTreePos)->right == NULL) // We are at the end of a branch
-                    return (*huffmanTreePos)->c;
-                else{ // It's an error because we aren't at the end of a branch and the instruction is impossible (going left without having a branch at the right)
-                    fprintf(stderr, "\nERROR : incorrect bit value\n");
-                    exit(EXIT_FAILURE);
-                }
+                // It's an error because we aren't at the end of a branch and the instruction is impossible (going left without having a branch at the left)
+                fprintf(stderr, "\nERROR : Incorrect bit value\n");
+                exit(EXIT_FAILURE);
             }
             break;
         case 1 : // Go right
             printf("1");
             if((*huffmanTreePos)->right != NULL){
                 (*huffmanTreePos) = (*huffmanTreePos)->right;
-                return -1;
+                if(((*huffmanTreePos)->left == NULL) && ((*huffmanTreePos)->right == NULL)) // We are at the end of a branch
+                    return (*huffmanTreePos)->c;
+                else
+                    return -1;
             }
             else{
-                if((*huffmanTreePos)->left == NULL) // We are at the end of a branch
-                    return (*huffmanTreePos)->c;
-                else{ // It's an error because we aren't at the end of a branch and the instruction is impossible (going left without having a branch at the right)
-                    fprintf(stderr, "\nERROR : incorrect bit value\n");
-                    exit(EXIT_FAILURE);
-                }
+                // It's an error because we aren't at the end of a branch and the instruction is impossible (going right without having a branch at the right)
+                fprintf(stderr, "\nERROR : Incorrect bit value\n");
+                exit(EXIT_FAILURE);
             }
             break;
         default:
-            fprintf(stderr, "\nERROR : incorrect bit value\n");
+            fprintf(stderr, "\nERROR : Incorrect bit value\n");
             exit(EXIT_FAILURE);
     }
 }
@@ -185,11 +174,9 @@ int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit)
 
 void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeHead, int sizeFileIn)
 {
-    int nbInsertions=0; // Number of characters that we have to insert (size of the initial uncompressed file)
     HuffmanTreePtr huffmanTreePos = huffmanTreeHead;
     uint8_t buffer=0;
     uint8_t bit;
-    int charFound=0;
     int progress=0;
     int c=-1;
     int sizeBuffer;
@@ -200,12 +187,9 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeH
     buffer=fgetc(fileIn);
     sizeBuffer=8;
 
-    while(nbInsertions<sizeFileIn){
-        if(charFound){
-            huffmanTreePos = huffmanTreeHead;
-            charFound=0;
-        }
-        while(sizeBuffer!=0 && nbInsertions<sizeFileIn){
+    while(posBuffOut<sizeFileIn){
+        while(sizeBuffer!=0 && posBuffOut<sizeFileIn){
+            printf("\nBUFF DECOMPRESS : %d|%c\n", buffer, buffer);
             bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
             if(sizeBuffer>1){
                 bit >>= sizeBuffer-1;  // We shift to the right to get the value wanted completely to the right (and so we get a value equals to 0 or 1)
@@ -216,21 +200,20 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeH
                 printf("\nc : %d|%c\n", c, c);
                 bufferOut->text[posBuffOut]=c;
                 posBuffOut++;
-                nbInsertions++;
-                charFound=1;
+                huffmanTreePos=huffmanTreeHead;
+                c=-1;
             }
             sizeBuffer--;
         }
-        if(progress+5<((nbInsertions+1)*100)/sizeFileIn)
+        if(progress+5<((posBuffOut+1)*100)/sizeFileIn)
         {
-            progress=(int)((((nbInsertions+1)*100)/sizeFileIn)/5)*5; //Display the progress of the current task
+            progress=(int)((((posBuffOut+1)*100)/sizeFileIn)/5)*5; //Display the progress of the current task
             printf("%d%%\n", progress);
         }
 
         buffer=fgetc(fileIn);
         sizeBuffer=8;
     }
-
 }
 
 
@@ -255,21 +238,27 @@ void decompressMain(char* fileNameIn)
     fileTable = fopen("table.txt", "rb");
     TESTFOPEN(fileTable);
     rewind(fileTable);
-    FileBuffer bufferChar = getBufferCharFromTable(fileTable, 1, readNumberLine(fileTable, 4));
+    FileBuffer bufferChar = getBufferCharFromTable(fileTable, 1, readNumberLine(fileTable, 3));
     rewind(fileTable);
     FileBuffer bufferPos = getBufferCharFromTable(fileTable, 0, readNumberLine(fileTable, 5));
 
-    printf("\nBUFFER_CHAR\n");
+    printf("\nBUFFER_Pos\n\"");
     for(int i=0; i<bufferChar.size; i++){
         printf("%c", bufferChar.text[i]);
     }
-    printf("\n");
+    printf("\"\n");
+
+    printf("\nBUFFER_Pos\n\"");
+    for(int i=0; i<bufferPos.size; i++){
+        printf("%c", bufferPos.text[i]);
+    }
+    printf("\"\n");
 
 
-    HuffmanTreePtr huffmanTree = createTreeFromFile(fileTable, bufferChar);
+    HuffmanTreePtr huffmanTree = createTreeFromBuffers(bufferPos, bufferChar);
     
-    indexBW=readNumberLine(fileTable, 0);
-    sizeFileIn=readNumberLine(fileTable, 2);
+    indexBW=readNumberLine(fileTable, 2);
+    sizeFileIn=readNumberLine(fileTable, 4);
     FCLOSE(fileTable);
     printf("\nDecompression...\n");
     decompress(fileIn, &bufferText, huffmanTree, sizeFileIn);
@@ -293,14 +282,14 @@ void decompressMain(char* fileNameIn)
     //If the file already exists
     #if __linux__
     if(access(fileNameIn, F_OK)!=0){
-        printf("The file \"%s\" already exists", fileNameIn);
+        printf("The file \"%s\" already exists\n", fileNameIn);
         printf("Enter a name for the decompressed file : \n");
         getFileName(fileNameIn);
     }
     #endif
     #if __WIN32__
     if(_access(fileNameIn, 0)!=-1){
-        printf("The file \"%s\" already exists", fileNameIn);
+        printf("The file \"%s\" already exists\n", fileNameIn);
         printf("Enter a name for the decompressed file : \n");
         getFileName(fileNameIn);
     }

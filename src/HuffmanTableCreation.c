@@ -270,10 +270,7 @@ void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_m
 
 void freeHuffmanTree(HuffmanTreeNode* huffmanNode)
 {
-    if(huffmanNode==NULL){
-        return;
-    }
-    else{
+    if(huffmanNode!=NULL){
         freeHuffmanTree(huffmanNode->left);
         freeHuffmanTree(huffmanNode->right);
         free(huffmanNode);
@@ -364,8 +361,6 @@ void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTree
 }
 
 
-
-
 void saveTree(int indexBW, HuffmanTreePtr huffmanTable, int sizeBufferChar, int fileSize)
 {
     int pos=0; // Used to write in the buffer bufferChar
@@ -401,15 +396,17 @@ void saveTree(int indexBW, HuffmanTreePtr huffmanTable, int sizeBufferChar, int 
  */
 
 
-FileBuffer saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize)
+FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
 {
     FileBuffer bufferTable;
+    PtrlistCode l=NULL;
+    int pos =0;
+
     bufferTable.size = 100; // It may be increased if needed
     bufferTable.text = (unsigned char*) malloc(sizeof(unsigned char)*bufferTable.size);
     TESTALLOC(bufferTable.text);
 
-    PtrlistCode l=NULL;
-    int pos =sprintf(bufferTable.text, "%d\n%d\n", indexBW, fileSize);
+    
     
     for(int i=0; i<sizeHuffmanTable; i++){
         l = huffmanTable[i].code;
@@ -420,7 +417,7 @@ FileBuffer saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffma
             pos++;
             l = l->next;
 
-            if(pos==bufferTable.size-1){
+            if(pos==bufferTable.size-1){ // the buffer is full so we increase its size
                 bufferTable.size+=100;
                 bufferTable.text = (unsigned char*) realloc(bufferTable.text, sizeof(unsigned char)*bufferTable.size);
             }
@@ -473,7 +470,7 @@ FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn)
     }
 
     saveTree(indexBW, occurrencesArray[i_min1].mergedHead, sizeHuffmanTable, bufferIn.size);
-    FileBuffer bufferTable = saveTable(indexBW, huffmanTable, sizeHuffmanTable, bufferIn.size);
+    FileBuffer bufferTable = saveTable(huffmanTable, sizeHuffmanTable);
     freeHuffmanTable(huffmanTable, sizeHuffmanTable);
     freeHuffmanTree(occurrencesArray[i_min1].mergedHead);
     freeOccurrencesArray(occurrencesArray, sizeOccurrencesArray);

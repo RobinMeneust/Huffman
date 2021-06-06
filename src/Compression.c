@@ -25,9 +25,6 @@ void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
     rewind(fileOut);
     int posIn=0;
     int posTable=0;
-
-    wordWrapBuffer(bufferTable, &posTable);
-    wordWrapBuffer(bufferTable, &posTable);
     while(posIn<bufferBW.size){
         c = bufferBW.text[posIn];
         c_table = bufferTable.text[posTable];
@@ -37,6 +34,7 @@ void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
             c_table = bufferTable.text[posTable];
             posTable++;
         }
+
         if(c_table!=c){
             printf("ERROR : Character not found in the table : %c|%d", c, c);
             exit(EXIT_FAILURE);
@@ -47,11 +45,13 @@ void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
         while(c_table!='\n' && posTable<bufferTable.size){
             switch(c_table){
                 case '0': buffer <<= 1; break;  //We shift bits to the left, then we add the bit (0 here) to the right
-                case '1': buffer <<= 1; buffer|=0b1; break; //We shift bits to the left, then we add the bit (1 here) to the right (ici 1), we use a mask to do so
+                case '1': buffer <<= 1; buffer|=0b1; break; //We shift bits to the left, then we add the bit (1 here) to the right, we use a mask to do so
+                default : fprintf(stderr, "\nERROR : Binary code not found in table\n"); exit(EXIT_FAILURE);
             }
             filling++;
             if(filling==8){ //The buffer is filled, we can insert it in the file
                 putc(buffer, fileOut);
+                printf(" ");
                 buffer=0;
                 filling=0;
             }
@@ -101,12 +101,14 @@ void compressMain(char* fileNameIn)
     FileBuffer bufferText=fileToBuffer(fileIn);
     FCLOSE(fileIn);
 
+
+
     if(sizeFileIn<1000)
     {
         //BURROWS WHEELER
         printf("\nBurrows Wheeler...\n");
         indexBW = burrowsWheeler(&bufferText);
-        
+
         // MTF
         printf("\nMove To Front...\n");
         moveToFrontEncode(&bufferText);
@@ -116,10 +118,29 @@ void compressMain(char* fileNameIn)
     printf("\nTable creation...\n");
     FileBuffer bufferTable = createHuffmanTable(indexBW, bufferText);
 
+
+    printf("\nBUFFERTEXT AP BW MTF\n\"");
+    for(int i=0; i<bufferText.size; i++){
+        if(bufferText.text[i]==0)
+            printf("0");
+        else
+            printf("%c", bufferText.text[i]);
+    }
+    printf("\"\n");
+
+
+    printf("\nBUFFER TABLE AV COMPRESSION\n\"");
+    for(int i=0; i<bufferTable.size; i++){
+        printf("%c", bufferTable.text[i]);
+    }
+    printf("\"\n");
+
+
     //COMPRESSION
     fileOut = fopen(strncat(fileNameIn, ".bin", 4), "wb+"); // We add a .bin at the end of the name so that the initial file isn't replaced
     TESTFOPEN(fileOut);
     printf("\nCompression...\n");
+
 
     compress(bufferText, fileOut, bufferTable);
     printf("\nEnd of compression\n");

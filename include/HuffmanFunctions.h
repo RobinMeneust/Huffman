@@ -29,7 +29,7 @@ void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_m
 void freeHuffmanTree(HuffmanTreeNode* huffmanNode);
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
 void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreePtr huffmanNode, int fileSize, int* pos, uint8_t *bufferPos, int* filling ,int* sizeBufferPosTotal);
-FileBuffer saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize);
+FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
 FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn);
 
 
