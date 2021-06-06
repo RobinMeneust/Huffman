@@ -19,12 +19,14 @@ void wordWrapFile(FILE* file);
 void wordWrapBuffer(FileBuffer buffer, int* posIn);
 int seekSizeOfFile(FILE* file);
 long seekNbFirstLineBuffer(FileBuffer buffer);
+HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, HuffmanTreeNode* rightNode, HuffmanTreeNode* parentNode);
+
+
 
 //HuffmanTableCreation.c
 OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* sizeOccurrencesArray);
 void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
 void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* sizeOccurrencesArray);
-HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, HuffmanTreeNode* rightNode, HuffmanTreeNode* parentNode);
 void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
 void freeHuffmanTree(HuffmanTreeNode* huffmanNode);
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);

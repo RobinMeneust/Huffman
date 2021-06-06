@@ -51,7 +51,6 @@ void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
             filling++;
             if(filling==8){ //The buffer is filled, we can insert it in the file
                 putc(buffer, fileOut);
-                printf(" ");
                 buffer=0;
                 filling=0;
             }
@@ -117,23 +116,6 @@ void compressMain(char* fileNameIn)
     //TABLE CREATION
     printf("\nTable creation...\n");
     FileBuffer bufferTable = createHuffmanTable(indexBW, bufferText);
-
-
-    printf("\nBUFFERTEXT AP BW MTF\n\"");
-    for(int i=0; i<bufferText.size; i++){
-        if(bufferText.text[i]==0)
-            printf("0");
-        else
-            printf("%c", bufferText.text[i]);
-    }
-    printf("\"\n");
-
-
-    printf("\nBUFFER TABLE AV COMPRESSION\n\"");
-    for(int i=0; i<bufferTable.size; i++){
-        printf("%c", bufferTable.text[i]);
-    }
-    printf("\"\n");
 
 
     //COMPRESSION

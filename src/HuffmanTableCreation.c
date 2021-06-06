@@ -164,16 +164,7 @@ void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* 
 }
 
 
-HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, HuffmanTreeNode* rightNode, HuffmanTreeNode* parentNode)
-{
-    HuffmanTreeNode* new_node = (HuffmanTreeNode*) malloc(sizeof(HuffmanTreeNode));
-    TESTALLOC(new_node);
-    new_node->c=c;
-    new_node->left=leftNode;
-    new_node->right=rightNode;
-    new_node->parent=parentNode;
-    return new_node;
-}
+
 
 
 /**
@@ -402,13 +393,15 @@ FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
     PtrlistCode l=NULL;
     int pos =0;
 
-    bufferTable.size = 100; // It may be increased if needed
+    bufferTable.size = 1000; // It may be increased if needed
     bufferTable.text = (unsigned char*) malloc(sizeof(unsigned char)*bufferTable.size);
     TESTALLOC(bufferTable.text);
 
     
     
     for(int i=0; i<sizeHuffmanTable; i++){
+        printf("\npos %d    size %d\n", pos, bufferTable.size);
+        printf("\n%d / %d\n", i, sizeHuffmanTable);
         l = huffmanTable[i].code;
         bufferTable.text[pos] = huffmanTable[i].c;
         pos++;
@@ -417,9 +410,11 @@ FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
             pos++;
             l = l->next;
 
-            if(pos==bufferTable.size-1){ // the buffer is full so we increase its size
-                bufferTable.size+=100;
+            if(pos==bufferTable.size-2){ // the buffer is full so we increase its size
+                bufferTable.size+=1000;
                 bufferTable.text = (unsigned char*) realloc(bufferTable.text, sizeof(unsigned char)*bufferTable.size);
+                TESTALLOC(bufferTable.text);
+                printf("REALLOC");
             }
         }
         bufferTable.text[pos] = '\n';
@@ -454,7 +449,7 @@ FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn)
 
     int i_min1;
     int i_min2;
-
+    printf("\nHuffman tree and table are generating...\n");
     while(sizeOccurrencesArray>1){  // Until there is only one element left
         i_min1 = 0;
         i_min2 = 1;
@@ -467,7 +462,9 @@ FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn)
         fillHuffmanTree(occurrencesArray, i_min1, i_min2);
         fillHuffmanTableCode(huffmanTable, sizeHuffmanTable, occurrencesArray, i_min1, i_min2);
         merge(i_min1, i_min2, occurrencesArray, &sizeOccurrencesArray);
+        printf("\nSIZE : %d\n", sizeOccurrencesArray);
     }
+    printf("\nSaving in files...\n");
 
     saveTree(indexBW, occurrencesArray[i_min1].mergedHead, sizeHuffmanTable, bufferIn.size);
     FileBuffer bufferTable = saveTable(huffmanTable, sizeHuffmanTable);

@@ -149,3 +149,17 @@ int seekSizeOfFile(FILE* file)
     rewind(file);
     return size;
 }
+
+
+HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, HuffmanTreeNode* rightNode, HuffmanTreeNode* parentNode)
+{
+    HuffmanTreeNode* new_node = (HuffmanTreeNode*) malloc(sizeof(HuffmanTreeNode));
+    TESTALLOC(new_node);
+    new_node->c=c;
+    new_node->left=leftNode;
+    new_node->right=rightNode;
+    new_node->parent=parentNode;
+    return new_node;
+}
+
+

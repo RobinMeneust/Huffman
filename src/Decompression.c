@@ -57,11 +57,14 @@ HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar
     currentNode = head;
     printf("\n\n");
     while(posBufferPos<bufferPos.size && !stop){
+        printf("a");
         buffer=bufferPos.text[posBufferPos];
         posBufferPos++;
         //printf("\nBUFFER    %d|%c\n", buffer, buffer);
         sizeBuffer=8;
         while(sizeBuffer!=0 && !stop){
+            printf("\nSIZE_pos  %d      POS_pos %d\n", bufferPos.size, posBufferPos);
+            printf("\nSIZE_ch  %d      POS_ch %d\n", bufferChar.size, posBufferChar);
             bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
             if(sizeBuffer>1){
                 bit >>= sizeBuffer-1;  // We shift to the right to get the value wanted completely to the right (and so we get a value equals to 0 or 1)
@@ -189,7 +192,6 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeH
 
     while(posBuffOut<sizeFileIn){
         while(sizeBuffer!=0 && posBuffOut<sizeFileIn){
-            printf("\nBUFF DECOMPRESS : %d|%c\n", buffer, buffer);
             bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
             if(sizeBuffer>1){
                 bit >>= sizeBuffer-1;  // We shift to the right to get the value wanted completely to the right (and so we get a value equals to 0 or 1)
@@ -232,31 +234,21 @@ void decompressMain(char* fileNameIn)
     FileBuffer bufferText;
     int indexBW=-1;
     int sizeFileIn=0;
-
     fileIn = fopen(fileNameIn, "rb");
     TESTFOPEN(fileIn);
     fileTable = fopen("table.txt", "rb");
     TESTFOPEN(fileTable);
     rewind(fileTable);
+
+    printf("\nFilling buffers from the table...\n");
     FileBuffer bufferChar = getBufferCharFromTable(fileTable, 1, readNumberLine(fileTable, 3));
     rewind(fileTable);
     FileBuffer bufferPos = getBufferCharFromTable(fileTable, 0, readNumberLine(fileTable, 5));
 
-    printf("\nBUFFER_Pos\n\"");
-    for(int i=0; i<bufferChar.size; i++){
-        printf("%c", bufferChar.text[i]);
-    }
-    printf("\"\n");
-
-    printf("\nBUFFER_Pos\n\"");
-    for(int i=0; i<bufferPos.size; i++){
-        printf("%c", bufferPos.text[i]);
-    }
-    printf("\"\n");
-
-
+    printf("\nGenerating the huffman tree from the table...\n");
     HuffmanTreePtr huffmanTree = createTreeFromBuffers(bufferPos, bufferChar);
-    
+
+    printf("\nGetting parameters from the table...\n");
     indexBW=readNumberLine(fileTable, 2);
     sizeFileIn=readNumberLine(fileTable, 4);
     FCLOSE(fileTable);
@@ -265,13 +257,13 @@ void decompressMain(char* fileNameIn)
     FCLOSE(fileIn);
     freeHuffmanTree(huffmanTree);
 
-
+/*
     printf("\nBUFFER\n");
     for(int i=0; i<bufferText.size; i++){
         printf("%c", bufferText.text[i]);
     }
     printf("\n");
-
+*/
 
     
     int sizeNameFileIn = strlen(fileNameIn);
