@@ -304,5 +304,7 @@ void decompressMain(char* fileNameIn)
 
     FCLOSE(fileOut);
     free(bufferText.text);
+    free(bufferPos.text);
+    free(bufferChar.text);
     printf("\nEnd of decompression\n");
 }

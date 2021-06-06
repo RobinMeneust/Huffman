@@ -30,7 +30,7 @@ void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* 
 void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
 void freeHuffmanTree(HuffmanTreeNode* huffmanNode);
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
-void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreePtr huffmanNode, int fileSize, int* pos, uint8_t *bufferPos, int* filling ,int* sizeBufferPosTotal);
+void readNodeHuffmanAndWrite(FILE* file, FileBuffer* bufferChar, FileBuffer* bufferPos, HuffmanTreePtr huffmanNode, int* posBufferChar, int* posBufferPos, uint8_t *buffer, int* filling);
 FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
 FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn);
 

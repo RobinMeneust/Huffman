@@ -128,6 +128,7 @@ void compressMain(char* fileNameIn)
     printf("\nEnd of compression\n");
     
     free(bufferText.text);
+    free(bufferTable.text);
     sizeFileOut = seekSizeOfFile(fileOut);
     FCLOSE(fileOut);
     printf("\nSpace saving : %.2f %%\n\n", (1-(((float)sizeFileOut)/sizeFileIn))*100);
