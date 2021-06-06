@@ -7,12 +7,10 @@ Update HuffmanFunctions.h
 Manage errors
 
 
-To correct error decompression : put the parameters in table at the geinning and only take the text under it by using thos parameters (size...)
 
-Don't forget to free FileBuffer
-
-Use a tree to compress/decompress to speed up the process for big files ? IDEA:
 _______________________________
+Tree saving method:
+
 0= go back
 1= continue
 
