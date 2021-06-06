@@ -179,7 +179,6 @@ void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
 {
     for(int i=0; i<size; i++){
         fputc(matBW[i0][i], fileBWDecode);
-        printf("%c", matBW[i0][i]);
     }
     printf("\n");
 }

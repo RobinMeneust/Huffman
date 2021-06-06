@@ -31,7 +31,6 @@ int main(int argc, char *argv[])
         choice = fgetc(stdin)-'0';
     }
     getchar();
-    printf("\nchoice %d :\n", choice);
 
     if(choice!=0){
         //Application of the chosen function

@@ -310,7 +310,6 @@ void readNodeHuffmanAndWrite(FILE* file, FileBuffer* bufferChar, FileBuffer* buf
                 bufferPos->size+=1000;
                 bufferPos->text = (unsigned char*) realloc(bufferPos->text, sizeof(unsigned char)*bufferPos->size);
                 TESTALLOC(bufferPos->text);
-                printf("REALLOC");
             }
 
         }
@@ -411,10 +410,10 @@ void saveTree(int indexBW, HuffmanTreePtr huffmanTable, int sizeBufferChar, int 
 
     // Saving in the file
     rewind(fileTable);
-    fprintf(fileTable, "%d\n%d\n%d\n%d\n", indexBW, fileSize, sizeBufferChar, posBufferPos);
-    fwrite(bufferChar.text, sizeof(unsigned char), bufferChar.size, fileTable);
+    fprintf(fileTable, "%d\n%d\n%d\n%d\n", indexBW, fileSize, sizeBufferChar, bufferPos.size);
+    fwrite(bufferChar.text, 1, bufferChar.size, fileTable);
     fputc('\n', fileTable);
-    fwrite(bufferPos.text, sizeof(FileBuffer), bufferPos.size , fileTable);
+    fwrite(bufferPos.text, 1, bufferPos.size, fileTable);
     fputc('\n', fileTable);
 
     free(bufferChar.text);
@@ -457,7 +456,6 @@ FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
                 bufferTable.size+=1000;
                 bufferTable.text = (unsigned char*) realloc(bufferTable.text, sizeof(unsigned char)*bufferTable.size);
                 TESTALLOC(bufferTable.text);
-                printf("REALLOC");
             }
         }
         bufferTable.text[pos] = '\n';
@@ -492,7 +490,7 @@ FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn)
 
     int i_min1;
     int i_min2;
-    printf("\nHuffman tree and table are generating...\n");
+    printf("\nHuffman tree and table are being generated...\n");
     while(sizeOccurrencesArray>1){  // Until there is only one element left
         i_min1 = 0;
         i_min2 = 1;
@@ -505,7 +503,6 @@ FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn)
         fillHuffmanTree(occurrencesArray, i_min1, i_min2);
         fillHuffmanTableCode(huffmanTable, sizeHuffmanTable, occurrencesArray, i_min1, i_min2);
         merge(i_min1, i_min2, occurrencesArray, &sizeOccurrencesArray);
-        printf("\nSIZE : %d\n", sizeOccurrencesArray);
     }
     printf("\nSaving table and tree...\n");
 

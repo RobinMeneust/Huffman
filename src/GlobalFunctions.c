@@ -120,6 +120,7 @@ void wordWrapBuffer(FileBuffer buffer, int* posIn)
         c = buffer.text[*posIn];
         (*posIn)++;
     }
+    
 }
 
 /**

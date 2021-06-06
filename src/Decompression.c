@@ -11,18 +11,14 @@
 
 
 
-FileBuffer getBufferCharFromTable(FILE* fileTable, int line, int sizeBuff)
+FileBuffer getBufferCharFromTable(FILE* fileTable, int sizeBuff)
 {
     FileBuffer bufferChar;
     int c=0;
     int posBuffer=0;
     bufferChar.size = sizeBuff;
     bufferChar.text = (unsigned char*) malloc(bufferChar.size*sizeof(unsigned char));
-    rewind(fileTable);
 
-    for(int i=0; i<line; i++){
-        wordWrapFile(fileTable);
-    }
     c=fgetc(fileTable);
     while(posBuffer<bufferChar.size && c!=EOF){
         bufferChar.text[posBuffer]=c;
@@ -55,16 +51,12 @@ HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar
     //createNodeHuff(c, left, right, parent);
     head = createNodeHuff('\0', NULL, NULL, NULL);
     currentNode = head;
-    printf("\n\n");
     while(posBufferPos<bufferPos.size && !stop){
-        printf("a");
         buffer=bufferPos.text[posBufferPos];
         posBufferPos++;
         //printf("\nBUFFER    %d|%c\n", buffer, buffer);
         sizeBuffer=8;
         while(sizeBuffer!=0 && !stop){
-            printf("\nSIZE_pos  %d      POS_pos %d\n", bufferPos.size, posBufferPos);
-            printf("\nSIZE_ch  %d      POS_ch %d\n", bufferChar.size, posBufferChar);
             bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
             if(sizeBuffer>1){
                 bit >>= sizeBuffer-1;  // We shift to the right to get the value wanted completely to the right (and so we get a value equals to 0 or 1)
@@ -75,14 +67,12 @@ HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar
             switch (bit)
             {
                 case 0 : // We go back to the parent
-                    //printf("0");
                     //We go back
                     if(prevBit==1){
                         currentNode->parent=previousNode;
                         currentNode->left=NULL;
                         currentNode->right=NULL;
                         currentNode->c=bufferChar.text[posBufferChar];
-                        //printf("CURRENT NODE c :%d|%c\n", currentNode->c, currentNode->c);
                         posBufferChar++;
                     }
                     previousNode=currentNode;
@@ -90,7 +80,6 @@ HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar
                     break;
 
                 case 1 : // We continue to the left (or right if we got back to the parent)
-                    //printf("1");
                     if(prevBit==0){ // = We got back to the parent
                         //We go to the right
                         nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
@@ -127,7 +116,6 @@ int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit)
     switch (bit)
     {
         case 0 : // Go left
-            printf("0");
             if((*huffmanTreePos)->left != NULL){
                 (*huffmanTreePos) = (*huffmanTreePos)->left;
                 if(((*huffmanTreePos)->left == NULL) && ((*huffmanTreePos)->right == NULL)) // We are at the end of a branch
@@ -142,7 +130,6 @@ int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit)
             }
             break;
         case 1 : // Go right
-            printf("1");
             if((*huffmanTreePos)->right != NULL){
                 (*huffmanTreePos) = (*huffmanTreePos)->right;
                 if(((*huffmanTreePos)->left == NULL) && ((*huffmanTreePos)->right == NULL)) // We are at the end of a branch
@@ -199,7 +186,7 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeH
             c = readTreeFromPos(&huffmanTreePos, bit);
             
             if(c!=-1){ // readTreeFromPos returned a character, we put it in bufferOut
-                printf("\nc : %d|%c\n", c, c);
+
                 bufferOut->text[posBuffOut]=c;
                 posBuffOut++;
                 huffmanTreePos=huffmanTreeHead;
@@ -232,33 +219,39 @@ void decompressMain(char* fileNameIn)
     FILE* fileOut;
     FILE* fileTable;
     FileBuffer bufferText;
+    FileBuffer bufferChar;
+    FileBuffer bufferPos;
     int indexBW=-1;
     int sizeFileIn=0;
     fileIn = fopen(fileNameIn, "rb");
     TESTFOPEN(fileIn);
     fileTable = fopen("table.txt", "rb");
     TESTFOPEN(fileTable);
-    rewind(fileTable);
 
-    printf("\nFilling buffers from the table...\n");
-    FileBuffer bufferChar = getBufferCharFromTable(fileTable, 1, readNumberLine(fileTable, 3));
+    bufferChar.size = readNumberLine(fileTable, 2);
+    bufferPos.size = readNumberLine(fileTable, 3);
+    readNumberLine(fileTable, 3);
     rewind(fileTable);
-    FileBuffer bufferPos = getBufferCharFromTable(fileTable, 0, readNumberLine(fileTable, 5));
+    wordWrapFile(fileTable); wordWrapFile(fileTable); wordWrapFile(fileTable); wordWrapFile(fileTable);
+    printf("\nFilling buffers from the table...\n");
+    bufferChar = getBufferCharFromTable(fileTable, bufferChar.size);
+    bufferPos = getBufferCharFromTable(fileTable, bufferPos.size);
 
     printf("\nGenerating the huffman tree from the table...\n");
     HuffmanTreePtr huffmanTree = createTreeFromBuffers(bufferPos, bufferChar);
 
     printf("\nGetting parameters from the table...\n");
-    indexBW=readNumberLine(fileTable, 2);
-    sizeFileIn=readNumberLine(fileTable, 4);
+    indexBW=readNumberLine(fileTable, 0);
+    sizeFileIn=readNumberLine(fileTable, 1);
     FCLOSE(fileTable);
     printf("\nDecompression...\n");
     decompress(fileIn, &bufferText, huffmanTree, sizeFileIn);
     FCLOSE(fileIn);
     freeHuffmanTree(huffmanTree);
 
+
 /*
-    printf("\nBUFFER\n");
+    printf("\nBUFFER_TEXT\n");
     for(int i=0; i<bufferText.size; i++){
         printf("%c", bufferText.text[i]);
     }
