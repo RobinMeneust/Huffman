@@ -14,8 +14,6 @@ Tree saving method:
 0= go back
 1= continue
 
-(+one to know when to get a value?) -> or auto when '_#'
-
 2 lines in the table file: 1st = position and 2nd = value when needed
 
 ex:
