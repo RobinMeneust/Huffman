@@ -297,7 +297,7 @@ void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurr
 
 
 
-void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreePtr huffmanNode, int fileSize, int* pos, uint8_t *bufferPos, int* filling)
+void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreePtr huffmanNode, int fileSize, int* pos, uint8_t *bufferPos, int* filling ,int* sizeBufferPosTotal)
 {
     if(*pos==fileSize){
         fprintf(stderr, "\nERROR : buffer full in the huffman table creation\n");
@@ -314,6 +314,7 @@ void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTree
         //printf("\n0FILLING %d\n", *filling);
         if(*filling==8){
             fputc(*bufferPos, file);
+            (*sizeBufferPosTotal)++;
             //printf("\nBUFFER_INS %d|%c\n", *bufferPos, *bufferPos);
             *filling=0;
             //printf(" ");
@@ -327,12 +328,13 @@ void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTree
         //printf("\n1FILLING %d\n", *filling);
         if(*filling==8){
             fputc(*bufferPos, file);
+            (*sizeBufferPosTotal)++;
             //printf("\nBUFFER_INS %d|%c\n", *bufferPos, *bufferPos);
             *filling=0;
             //printf(" ");
         }
 
-        readNodeHuffmanAndWrite(file, bufferChar, huffmanNode->left, fileSize, pos, bufferPos, filling);
+        readNodeHuffmanAndWrite(file, bufferChar, huffmanNode->left, fileSize, pos, bufferPos, filling, sizeBufferPosTotal);
         //printf("1b");
         (*bufferPos)<<=1; // We add a '1' to the buffer
         (*bufferPos)|=0b1;
@@ -340,17 +342,19 @@ void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTree
         //printf("\n2FILLING %d\n", *filling);
         if(*filling==8){
             fputc(*bufferPos, file);
+            (*sizeBufferPosTotal)++;
             //printf("\nBUFFER_INS %d|%c\n", *bufferPos, *bufferPos);
             *filling=0;
             //printf(" ");
         }
-        readNodeHuffmanAndWrite(file, bufferChar, huffmanNode->right, fileSize, pos, bufferPos, filling);
+        readNodeHuffmanAndWrite(file, bufferChar, huffmanNode->right, fileSize, pos, bufferPos, filling, sizeBufferPosTotal);
         //printf("0b");
         (*bufferPos)<<=1; // We add a '1' to the buffer
         (*filling)++;
         //printf("\n3FILLING %d\n", *filling);
         if(*filling==8){
             fputc(*bufferPos, file);
+            (*sizeBufferPosTotal)++;
             //printf("\nBUFFER_INS %d|%c\n", *bufferPos, *bufferPos);
             *filling=0;
            //printf(" ");
@@ -366,21 +370,22 @@ void saveTree(int indexBW, HuffmanTreePtr huffmanTable, int sizeBufferChar, int 
 {
     int pos=0; // Used to write in the buffer bufferChar
     int filling=0; // between 0 and 8 : 8=filled
+    int sizeBufferPosTotal=0; // To know the number of characters used for instructions in table.txt
     FILE* fileTable = fopen("table.txt", "wb+");
     TESTFOPEN(fileTable);
-    fprintf(fileTable, "%d\n%d\n%d\n", indexBW, sizeBufferChar, fileSize);
     uint8_t bufferPos=0; // Buffer containing position instructions (go ro the parent, continue...)
     unsigned char* bufferChar = (unsigned char*) malloc(sizeBufferChar*sizeof(unsigned char));
     TESTALLOC(bufferChar);
-    readNodeHuffmanAndWrite(fileTable, bufferChar, huffmanTable, sizeBufferChar, &pos, &bufferPos, &filling);
+    readNodeHuffmanAndWrite(fileTable, bufferChar, huffmanTable, sizeBufferChar, &pos, &bufferPos, &filling, &sizeBufferPosTotal);
     if(filling>0){
-        printf("\nFILLING %d\n", filling);
-        printf("\n8-FILLING %d\n", 8-filling);
         bufferPos<<=(8-filling);
         fputc(bufferPos, fileTable);
+        sizeBufferPosTotal++;
     }
     fputc('\n', fileTable);
     fwrite(bufferChar, sizeof(unsigned char), sizeBufferChar, fileTable);
+    fputc('\n', fileTable);
+    fprintf(fileTable, "%d\n%d\n%d\n%d\n", indexBW, sizeBufferChar, fileSize, sizeBufferPosTotal);
 
     FCLOSE(fileTable);
 }

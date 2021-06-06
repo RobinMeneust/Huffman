@@ -11,22 +11,23 @@
 
 
 
-FileBuffer getBufferCharFromTable(FILE* fileTable)
+FileBuffer getBufferCharFromTable(FILE* fileTable, int line, int sizeBuff)
 {
     FileBuffer bufferChar;
-    int i=0;
     int c=0;
     int posBuffer=0;
-    rewind(fileTable);
-    bufferChar.size = readNumberLine(fileTable, 1);
+    bufferChar.size = sizeBuff;
     bufferChar.text = (unsigned char*) malloc(bufferChar.size*sizeof(unsigned char));
-    wordWrapFile(fileTable);
-    wordWrapFile(fileTable);
+    rewind(fileTable);
+
+    for(int i=0; i<line; i++){
+        wordWrapFile(fileTable);
+    }
     c=fgetc(fileTable);
-    while(i<bufferChar.size && c!=EOF){
+    while(posBuffer<bufferChar.size && c!=EOF){
         bufferChar.text[posBuffer]=c;
+        posBuffer++;
         c=fgetc(fileTable);
-        i++;
     }
 
     return bufferChar;
@@ -69,6 +70,7 @@ HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
     printf("\n\n");
     while(ftell(fileTable)!=posEndLine-1 && !stop){
         buffer=fgetc(fileTable);
+        printf("\nBUFFER    %d|%c\n", buffer, buffer);
         sizeBuffer=8;
         while(sizeBuffer!=0 && !stop){
             bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
@@ -81,14 +83,14 @@ HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
             switch (bit)
             {
             case 0 : // We go back to the parent
-                printf("0");
+                //printf("0");
                 //We go back
                 if(prevBit==1){
                     currentNode->parent=previousNode;
                     currentNode->left=NULL;
                     currentNode->right=NULL;
                     currentNode->c=bufferChar.text[posBuffer];
-                    printf("CURRENT NODE c :%d|%c\n", currentNode->c, currentNode->c);
+                    //printf("CURRENT NODE c :%d|%c\n", currentNode->c, currentNode->c);
                     posBuffer++;
                 }
                 previousNode=currentNode;
@@ -96,7 +98,7 @@ HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
                 break;
 
             case 1 : // We continue to the left (or right if we got back to the parent)
-                printf("1");
+                //printf("1");
                 if(prevBit==0){ // = We got back to the parent
                     //We go to the right
                     nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
@@ -252,8 +254,18 @@ void decompressMain(char* fileNameIn)
     TESTFOPEN(fileIn);
     fileTable = fopen("table.txt", "rb");
     TESTFOPEN(fileTable);
+    rewind(fileTable);
+    FileBuffer bufferChar = getBufferCharFromTable(fileTable, 1, readNumberLine(fileTable, 4));
+    rewind(fileTable);
+    FileBuffer bufferPos = getBufferCharFromTable(fileTable, 0, readNumberLine(fileTable, 5));
 
-    FileBuffer bufferChar = getBufferCharFromTable(fileTable);
+    printf("\nBUFFER_CHAR\n");
+    for(int i=0; i<bufferChar.size; i++){
+        printf("%c", bufferChar.text[i]);
+    }
+    printf("\n");
+
+
     HuffmanTreePtr huffmanTree = createTreeFromFile(fileTable, bufferChar);
     
     indexBW=readNumberLine(fileTable, 0);
@@ -262,6 +274,16 @@ void decompressMain(char* fileNameIn)
     printf("\nDecompression...\n");
     decompress(fileIn, &bufferText, huffmanTree, sizeFileIn);
     FCLOSE(fileIn);
+    freeHuffmanTree(huffmanTree);
+
+
+    printf("\nBUFFER\n");
+    for(int i=0; i<bufferText.size; i++){
+        printf("%c", bufferText.text[i]);
+    }
+    printf("\n");
+
+
     
     int sizeNameFileIn = strlen(fileNameIn);
     if(fileNameIn[sizeNameFileIn-4]=='.' && fileNameIn[sizeNameFileIn-3]=='b' && fileNameIn[sizeNameFileIn-2]=='i' && fileNameIn[sizeNameFileIn-1]=='n'){
@@ -298,13 +320,6 @@ void decompressMain(char* fileNameIn)
     {
         bufferToFile(bufferText, fileOut);
     }
-
-    printf("\nBUFFER\n");
-    for(int i=0; i<bufferText.size; i++){
-        printf("%c", bufferText.text[i]);
-    }
-    printf("\n");
-
 
     FCLOSE(fileOut);
     free(bufferText.text);
