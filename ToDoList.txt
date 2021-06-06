@@ -2,7 +2,9 @@ Check table syntax
 SDL ?
 Use larger buffers when writting in files ?
 Reduce table size
-Add doxygen comments for newf fcuntions
+Add doxygen comments for new functions
+Update HuffmanFunctions.h
+Manage errors
 
 Use a tree to compress/decompress to speed up the process for big files ? IDEA:
 _______________________________

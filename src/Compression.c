@@ -98,33 +98,33 @@ void compressMain(char* fileNameIn)
     TESTFOPEN(fileIn);
     sizeFileIn = seekSizeOfFile(fileIn);
 
-    FileBuffer buffertext=fileToBuffer(fileIn);
+    FileBuffer bufferText=fileToBuffer(fileIn);
     FCLOSE(fileIn);
 
     if(sizeFileIn<1000)
     {
         //BURROWS WHEELER
         printf("\nBurrows Wheeler...\n");
-        indexBW = burrowsWheeler(&buffertext);
+        indexBW = burrowsWheeler(&bufferText);
         
         // MTF
         printf("\nMove To Front...\n");
-        moveToFrontEncode(&buffertext);
+        moveToFrontEncode(&bufferText);
     } 
 
     //TABLE CREATION
     printf("\nTable creation...\n");
-    FileBuffer bufferTable = createHuffmanTable(indexBW, buffertext);
+    FileBuffer bufferTable = createHuffmanTable(indexBW, bufferText);
 
     //COMPRESSION
     fileOut = fopen(strncat(fileNameIn, ".bin", 4), "wb+"); // We add a .bin at the end of the name so that the initial file isn't replaced
     TESTFOPEN(fileOut);
     printf("\nCompression...\n");
 
-    compress(buffertext, fileOut, bufferTable);
+    compress(bufferText, fileOut, bufferTable);
     printf("\nEnd of compression\n");
     
-    free(buffertext.text);
+    free(bufferText.text);
     sizeFileOut = seekSizeOfFile(fileOut);
     FCLOSE(fileOut);
     printf("\nSpace saving : %.2f %%\n\n", (1-(((float)sizeFileOut)/sizeFileIn))*100);

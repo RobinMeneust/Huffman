@@ -38,7 +38,7 @@
 
 #define FCLOSE(X){\
             if(fclose(X)==EOF){\
-                fprintf(stderr, "ERROR : Cannot close the file"); \
+                fprintf(stderr, "\nERROR : Cannot close the file\n"); \
                 exit(EXIT_FAILURE); \
             }\
 }
@@ -49,7 +49,7 @@
 
 #define TESTFOPEN(X){\
             if(X==NULL){\
-                fprintf(stderr, "ERROR : Cannot open the file"); \
+                fprintf(stderr, "\nERROR : Cannot open the file\n"); \
                 exit(EXIT_FAILURE); \
             }\
 }
@@ -60,7 +60,7 @@
 
 #define TESTALLOC(X){\
             if(X==NULL){\
-                fprintf(stderr, "ERROR : Cannot allocate memory"); \
+                fprintf(stderr, "\nERROR : Cannot allocate memory\n"); \
                 exit(EXIT_FAILURE); \
             }\
 }

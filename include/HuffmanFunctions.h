@@ -28,7 +28,7 @@ HuffmanTreeNode* createNodeHuff(unsigned char c, HuffmanTreeNode* leftNode, Huff
 void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
 void freeHuffmanTree(HuffmanTreeNode* huffmanNode);
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
-void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreePtr huffmanNode, int fileSize, int* pos, uint8_t bufferPos, int* filling);
+void readNodeHuffmanAndWrite(FILE* file, unsigned char * bufferChar, HuffmanTreePtr huffmanNode, int fileSize, int* pos, uint8_t *bufferPos, int* filling);
 FileBuffer saveTable(int indexBW, HuffmanTableCell* huffmanTable, int sizeHuffmanTable, int fileSize);
 FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn);
 
@@ -41,7 +41,7 @@ void compressMain(char* fileNameIn);
 int initializePossibleElementsArray(int* possibleElementsArray, FILE* table);
 unsigned char seekFirstPositiveIndex(int* possibleElementsArray);
 void refreshPossibleElementsArray(int* possibleElementsArray, FILE* table, uint8_t bit, int position, int* nbElements);
-void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable);
+void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeHead, int sizeFileIn);
 void decompressMain();
 
 //BurrowsWheeler.c

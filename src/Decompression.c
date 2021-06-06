@@ -13,6 +13,23 @@
 
 FileBuffer getBufferCharFromTable(FILE* fileTable)
 {
+    FileBuffer bufferChar;
+    int i=0;
+    int c=0;
+    int posBuffer=0;
+    rewind(fileTable);
+    bufferChar.size = readNumberLine(fileTable, 1);
+    bufferChar.text = (unsigned char*) malloc(bufferChar.size*sizeof(unsigned char));
+    wordWrapFile(fileTable);
+    wordWrapFile(fileTable);
+    c=fgetc(fileTable);
+    while(i<bufferChar.size && c!=EOF){
+        bufferChar.text[posBuffer]=c;
+        c=fgetc(fileTable);
+        i++;
+    }
+
+    return bufferChar;
     
 }
 
@@ -23,6 +40,7 @@ FileBuffer getBufferCharFromTable(FILE* fileTable)
 HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
 {
     int posBuffer=0;
+    int posEndLine=0;
     int sizeBuffer;
     HuffmanTreePtr currentNode = NULL;
     HuffmanTreePtr previousNode=NULL;
@@ -32,14 +50,24 @@ HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
     int stop=0;
     uint8_t bit=0;
     uint8_t prevBit=1;
+
     rewind(fileTable);
+    wordWrapFile(fileTable);
+    wordWrapFile(fileTable);
+    wordWrapFile(fileTable);
+    wordWrapFile(fileTable);
+    posEndLine = ftell(fileTable);
+
+    rewind(fileTable);
+    wordWrapFile(fileTable);
     wordWrapFile(fileTable);
     wordWrapFile(fileTable);
 
     //createNodeHuff(c, left, right, parent);
     head = createNodeHuff('\0', NULL, NULL, NULL);
     currentNode = head;
-    while(!feof(fileTable) && !stop){
+    printf("\n\n");
+    while(ftell(fileTable)!=posEndLine-1 && !stop){
         buffer=fgetc(fileTable);
         sizeBuffer=8;
         while(sizeBuffer!=0 && !stop){
@@ -53,19 +81,22 @@ HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
             switch (bit)
             {
             case 0 : // We go back to the parent
+                printf("0");
                 //We go back
                 if(prevBit==1){
                     currentNode->parent=previousNode;
+                    currentNode->left=NULL;
+                    currentNode->right=NULL;
                     currentNode->c=bufferChar.text[posBuffer];
+                    printf("CURRENT NODE c :%d|%c\n", currentNode->c, currentNode->c);
                     posBuffer++;
                 }
-                currentNode->left=NULL;
-                currentNode->right=NULL;
                 previousNode=currentNode;
                 currentNode=currentNode->parent;
                 break;
 
             case 1 : // We continue to the left (or right if we got back to the parent)
+                printf("1");
                 if(prevBit==0){ // = We got back to the parent
                     //We go to the right
                     nextNode = createNodeHuff('\0', NULL, NULL, currentNode);
@@ -95,6 +126,52 @@ HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
 }
 
 
+
+
+int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit)
+{
+    switch (bit)
+    {
+        case 0 : // Go left
+            printf("0");
+            if((*huffmanTreePos)->left != NULL){
+                (*huffmanTreePos) = (*huffmanTreePos)->left;
+                return -1;
+            }
+            else{
+                if((*huffmanTreePos)->right == NULL) // We are at the end of a branch
+                    return (*huffmanTreePos)->c;
+                else{ // It's an error because we aren't at the end of a branch and the instruction is impossible (going left without having a branch at the right)
+                    fprintf(stderr, "\nERROR : incorrect bit value\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            break;
+        case 1 : // Go right
+            printf("1");
+            if((*huffmanTreePos)->right != NULL){
+                (*huffmanTreePos) = (*huffmanTreePos)->right;
+                return -1;
+            }
+            else{
+                if((*huffmanTreePos)->left == NULL) // We are at the end of a branch
+                    return (*huffmanTreePos)->c;
+                else{ // It's an error because we aren't at the end of a branch and the instruction is impossible (going left without having a branch at the right)
+                    fprintf(stderr, "\nERROR : incorrect bit value\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            break;
+        default:
+            fprintf(stderr, "\nERROR : incorrect bit value\n");
+            exit(EXIT_FAILURE);
+    }
+}
+
+
+
+
+
 /**
  * \fn void decompress(FILE* fileIn, FILE* bufferOut, FILE* fileTable)
  * \brief Decompresses fileIn in bufferOut by using fileTable
@@ -104,40 +181,41 @@ HuffmanTreePtr createTreeFromFile(FILE* fileTable, FileBuffer bufferChar)
  */
 
 
-void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
+void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeHead, int sizeFileIn)
 {
-    int sizeFileIn = readNumberLine(fileTable, 1);
     int nbInsertions=0; // Number of characters that we have to insert (size of the initial uncompressed file)
+    HuffmanTreePtr huffmanTreePos = huffmanTreeHead;
     uint8_t buffer=0;
     uint8_t bit;
+    int charFound=0;
     int progress=0;
+    int c=-1;
     int sizeBuffer;
-    int position;
-    int possibleElementsArrayPossibles[N_ASCII];  // contains 0 or 1 : 1 = the sequence matches or 0 in the other case
-    int nbElementsPossibles = N_ASCII;
-    int pos=0;
+    int posBuffOut=0;
     bufferOut->text = (unsigned char*) malloc(sizeof(unsigned char)*sizeFileIn);
     bufferOut->size=sizeFileIn;
     rewind(fileIn);
     buffer=fgetc(fileIn);
-    position=0;
     sizeBuffer=8;
-    nbElementsPossibles = initializePossibleElementsArray(possibleElementsArrayPossibles, fileTable);
-    while(nbInsertions<sizeFileIn && nbElementsPossibles!=0){
-        while(sizeBuffer!=0 && nbElementsPossibles!=0 && nbInsertions<sizeFileIn){
+
+    while(nbInsertions<sizeFileIn){
+        if(charFound){
+            huffmanTreePos = huffmanTreeHead;
+            charFound=0;
+        }
+        while(sizeBuffer!=0 && nbInsertions<sizeFileIn){
             bit = buffer & (1<<(sizeBuffer-1));  // We use a mask to get the bit at the position sizebuffer-1 (between 2^0 and 2^7)
             if(sizeBuffer>1){
                 bit >>= sizeBuffer-1;  // We shift to the right to get the value wanted completely to the right (and so we get a value equals to 0 or 1)
-            }   
-            refreshPossibleElementsArray(possibleElementsArrayPossibles, fileTable, bit, position, &nbElementsPossibles);
-            position++;
-            if(nbElementsPossibles==1){ // There is only possibility left, so it's the (decompressed) character that we have to insert
-                unsigned char c=seekFirstPositiveIndex(possibleElementsArrayPossibles);
-                bufferOut->text[pos]=c;
-                pos++;
-                position=0;
-                nbElementsPossibles = initializePossibleElementsArray(possibleElementsArrayPossibles, fileTable);
+            }
+            c = readTreeFromPos(&huffmanTreePos, bit);
+            
+            if(c!=-1){ // readTreeFromPos returned a character, we put it in bufferOut
+                printf("\nc : %d|%c\n", c, c);
+                bufferOut->text[posBuffOut]=c;
+                posBuffOut++;
                 nbInsertions++;
+                charFound=1;
             }
             sizeBuffer--;
         }
@@ -151,10 +229,6 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, FILE* fileTable)
         sizeBuffer=8;
     }
 
-    if(nbElementsPossibles==0){
-        fprintf(stderr, "ERROR : Could not find the code in the table");
-        exit(EXIT_FAILURE);
-    }
 }
 
 
@@ -170,7 +244,9 @@ void decompressMain(char* fileNameIn)
     FILE* fileIn;
     FILE* fileOut;
     FILE* fileTable;
-    int indexBW;
+    FileBuffer bufferText;
+    int indexBW=-1;
+    int sizeFileIn=0;
 
     fileIn = fopen(fileNameIn, "rb");
     TESTFOPEN(fileIn);
@@ -178,17 +254,14 @@ void decompressMain(char* fileNameIn)
     TESTFOPEN(fileTable);
 
     FileBuffer bufferChar = getBufferCharFromTable(fileTable);
-
     HuffmanTreePtr huffmanTree = createTreeFromFile(fileTable, bufferChar);
-
-    FCLOSE(fileTable);
+    
     indexBW=readNumberLine(fileTable, 0);
-
-    printf("\nDecompression...\n");
-    FileBuffer buffertext;
-    decompress(fileIn, &buffertext, huffmanTree);
-    FCLOSE(fileIn);
+    sizeFileIn=readNumberLine(fileTable, 2);
     FCLOSE(fileTable);
+    printf("\nDecompression...\n");
+    decompress(fileIn, &bufferText, huffmanTree, sizeFileIn);
+    FCLOSE(fileIn);
     
     int sizeNameFileIn = strlen(fileNameIn);
     if(fileNameIn[sizeNameFileIn-4]=='.' && fileNameIn[sizeNameFileIn-3]=='b' && fileNameIn[sizeNameFileIn-2]=='i' && fileNameIn[sizeNameFileIn-1]=='n'){
@@ -198,14 +271,14 @@ void decompressMain(char* fileNameIn)
     //If the file already exists
     #if __linux__
     if(access(fileNameIn, F_OK)!=0){
-        printf("ERROR : The file \"%s\" already exists", fileNameIn);
+        printf("The file \"%s\" already exists", fileNameIn);
         printf("Enter a name for the decompressed file : \n");
         getFileName(fileNameIn);
     }
     #endif
     #if __WIN32__
     if(_access(fileNameIn, 0)!=-1){
-        printf("ERROR : The file \"%s\" already exists", fileNameIn);
+        printf("The file \"%s\" already exists", fileNameIn);
         printf("Enter a name for the decompressed file : \n");
         getFileName(fileNameIn);
     }
@@ -216,16 +289,24 @@ void decompressMain(char* fileNameIn)
     if(indexBW>=0)
     {
         printf("\nDecoding Move To Front...\n");
-        moveToFrontDecode(&buffertext);
+        moveToFrontDecode(&bufferText);
 
         printf("\nDecoding Burrows Wheeler...\n");
-        burrowsWheelerDecode(indexBW, buffertext, fileOut);
+        burrowsWheelerDecode(indexBW, bufferText, fileOut);
     }
     else
     {
-        bufferToFile(buffertext, fileOut);
+        bufferToFile(bufferText, fileOut);
     }
+
+    printf("\nBUFFER\n");
+    for(int i=0; i<bufferText.size; i++){
+        printf("%c", bufferText.text[i]);
+    }
+    printf("\n");
+
+
     FCLOSE(fileOut);
-    free(buffertext.text);
+    free(bufferText.text);
     printf("\nEnd of decompression\n");
 }
