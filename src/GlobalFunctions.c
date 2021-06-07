@@ -105,7 +105,7 @@ FileBuffer fileToBuffer(FILE* file)
  * \brief Gives the number contained in the given line of the file read (integer value)
  * \param file file read
  * \param line Line of the file that is read
- * \return Value contained in the line read
+ * \return Value contained in the line read or -1 by default if we can't read a number
  */
 
 long readNumberLine(FILE* file, long line)
@@ -122,7 +122,10 @@ long readNumberLine(FILE* file, long line)
     }
 
     while(((c=fgetc(file))!=EOF) && c!='\n'){
-        valeur=(valeur*10)+c-'0';
+        if(c<48 || c>57) // if c isn't a number
+            return -1;
+        else
+            valeur=(valeur*10)+c-'0';
     }
     return valeur;
 }
