@@ -10,30 +10,60 @@
 
 
 /**
+ * \fn void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
+ * \brief Frees the memory used by huffmanTable and its linked lists (of the field code)
+ * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
+ * \param sizeHuffmanTable Size of huffmanTable
+ */
+
+
+void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
+{
+    PtrlistCode p = NULL;
+    for(int i=0; i<sizeHuffmanTable; i++){
+        while(huffmanTable[i].code!=NULL){
+            p = huffmanTable[i].code;
+            huffmanTable[i].code = huffmanTable[i].code->next;
+            free(p);
+        }
+    }
+    free(huffmanTable);
+}
+
+
+
+
+
+
+/**
  * \fn void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
  * \brief Compresses bufferBW by using the Huffman table
  * \param bufferBW Buffer that is being compressed
  * \param fileOut File compressed filled in this function by using the Huffman coding
- * \param bufferTable Buffer in which is saved the Huffman table (characters associated to a binary code)
+ * \param huffmanTable Array of structures HuffmanTableCell containing all the characters associated to a sequence of 0 or 1 depending of their number of occurrences in the initial file
+ * \param sizeHuffmanTable Number of unique elements in the initial file (after the application of the extensions). Size of the array huffmanTable
  */
 
-void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
+void compress(FileBuffer bufferBW, FILE* fileOut, HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
 {
     uint8_t buffer=0;   // Byte used to contain the binary code before being inserted in the file fileOut
+    FileBuffer bufferOut; // Used to write in fileOut
+    bufferOut.text = (unsigned char*) malloc(sizeof(unsigned char)*BUFFER_SIZE);
+    bufferOut.size=0;
     int filling=0;
     int progress=0;
     unsigned char c, c_table;
     rewind(fileOut);
     int posIn=0;
     int posTable=0;
+    PtrlistCode l=NULL;
+
     while(posIn<bufferBW.size){
         c = bufferBW.text[posIn];
-        c_table = bufferTable.text[posTable];
-        posTable++;
-        while(c_table!=c && posTable<bufferTable.size){
-            wordWrapBuffer(bufferTable, &posTable);
-            c_table = bufferTable.text[posTable];
+        c_table = huffmanTable[posTable].c;
+        while(c_table!=c && posTable<sizeHuffmanTable){
             posTable++;
+            c_table = huffmanTable[posTable].c;
         }
 
         if(c_table!=c){
@@ -41,22 +71,29 @@ void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
             exit(EXIT_FAILURE);
         }
 
-        c_table = bufferTable.text[posTable];
-        posTable++;
-        while(c_table!='\n' && posTable<bufferTable.size){
-            switch(c_table){
+        l = huffmanTable[posTable].code;
+
+        while(l!=NULL){
+            switch(l->value){
                 case '0': buffer <<= 1; break;  //We shift bits to the left, then we add the bit (0 here) to the right
                 case '1': buffer <<= 1; buffer|=0b1; break; //We shift bits to the left, then we add the bit (1 here) to the right, we use a mask to do so
                 default : fprintf(stderr, "\nERROR : Binary code not found in table\n"); exit(EXIT_FAILURE);
             }
+
             filling++;
-            if(filling==8){ //The buffer is filled, we can insert it in the file
-                putc(buffer, fileOut);
+            if(filling==8){ //The buffer is filled, we can insert it in bufferOut
+                bufferOut.text[bufferOut.size]=buffer;
+                bufferOut.size++;
                 buffer=0;
                 filling=0;
+
+                if(bufferOut.size==BUFFER_SIZE){ // The buffer is full
+                    fwrite(bufferOut.text, sizeof(unsigned char), bufferOut.size, fileOut);
+                    bufferOut.size=0;
+                }
             }
-            c_table = bufferTable.text[posTable];
-            posTable++;
+
+            l = l->next;
         }
         posIn++;
         posTable=0;
@@ -66,17 +103,24 @@ void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
             progress=(int)((((posIn+1)*100)/bufferBW.size)/5)*5; //Display the progress of the current task
             printf("%d%%\n", progress);
         }
-
     }
+
     if(filling!=0){
         while(filling<8 && buffer!=0){
             buffer <<= 1;
             filling++;
         }
-        putc(buffer, fileOut);
+        bufferOut.text[bufferOut.size]=buffer;
+        bufferOut.size++;
         buffer=0;
         filling=0;
     }
+
+    if(bufferOut.size>0){ // The buffer isn't empty
+        fwrite(bufferOut.text, sizeof(unsigned char), bufferOut.size, fileOut);
+        bufferOut.size=0;
+    }
+    free(bufferOut.text);
 }
 
 
@@ -92,6 +136,7 @@ void compressMain(char* fileNameIn)
     FILE* fileOut;
     long sizeFileIn;
     long sizeFileOut;
+    int sizeHuffmanTable=0;
     int indexBW=-1; // if the value is still -1 when we write it in the table then we won't apply BW and MTF to decompress the file
 
     fileIn = fopen(fileNameIn, "rb");
@@ -116,20 +161,18 @@ void compressMain(char* fileNameIn)
 
     //TABLE CREATION
     printf("\nTable creation...\n");
-    FileBuffer bufferTable = createHuffmanTable(indexBW, bufferText);
-
+    HuffmanTableCell* huffmanTable = createHuffmanTable(indexBW, bufferText, &sizeHuffmanTable);
 
     //COMPRESSION
     fileOut = fopen(strcat(fileNameIn, ".bin"), "wb+"); // We add a .bin at the end of the name so that the initial file isn't replaced
     TESTFOPEN(fileOut);
     printf("\nCompression...\n");
 
-
-    compress(bufferText, fileOut, bufferTable);
+    compress(bufferText, fileOut, huffmanTable, sizeHuffmanTable);
     printf("\nEnd of compression\n");
     
     free(bufferText.text);
-    free(bufferTable.text);
+    freeHuffmanTable(huffmanTable, sizeHuffmanTable);
     sizeFileOut = seekSizeOfFile(fileOut);
     FCLOSE(fileOut);
     printf("\nSpace saving : %.2f %%\n\n", (1-(((float)sizeFileOut)/sizeFileIn))*100);

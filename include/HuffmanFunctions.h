@@ -32,24 +32,26 @@ OccurrencesArrayCell* fillOccurrencesArray(FileBuffer buffer, int* sizeOccurrenc
 void seek2Min(int* i_min1, int* i_min2, OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
 void merge(int i_min1, int i_min2, OccurrencesArrayCell* occurrencesArray, int* sizeOccurrencesArray);
 void fillHuffmanTableCode(HuffmanTableCell* huffmanTable, int sizeHuffmanTable, OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
-void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
 void fillHuffmanTree(OccurrencesArrayCell* occurrencesArray, int i_min1, int i_min2);
 void freeHuffmanTree(HuffmanTreeNode* huffmanNode);
 void freeOccurrencesArray(OccurrencesArrayCell* occurrencesArray, int sizeOccurrencesArray);
 void readNodeHuffmanAndWrite(FileBuffer* bufferChar, FileBuffer* bufferPos, HuffmanTreePtr huffmanNode, int* posBufferChar, int* posBufferPos, uint8_t *buffer, int* filling);
 void saveTree(int indexBW, HuffmanTreePtr huffmanTree, int sizeBufferChar, int fileSize);
-FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
-FileBuffer createHuffmanTable(int indexBW, FileBuffer bufferIn);
+HuffmanTableCell* createHuffmanTable(int indexBW, FileBuffer bufferIn, int* sizeHuffmanTable);
+
 
 //Compression.c
-void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable);
+void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
+void compress(FileBuffer bufferBW, FILE* fileOut, HuffmanTableCell* huffmanTable, int sizeHuffmanTable);
 void compressMain(char* fileNameIn);
+
 
 //Decompression.c
 HuffmanTreePtr createTreeFromBuffers(FileBuffer bufferPos, FileBuffer bufferChar);
 int readTreeFromPos(HuffmanTreePtr* huffmanTreePos, uint8_t bit);
 void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeHead, int sizeFileIn);
 void decompressMain();
+
 
 //BurrowsWheeler.c
 unsigned char ** allocateMatBW(long size);
@@ -62,6 +64,7 @@ void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
 void rotationSort(unsigned char* tabChar,int* indexes, int size);
 int burrowsWheeler(FileBuffer* bufferIn);
 void burrowsWheelerDecode(int indexBW, FileBuffer bufferIn, FILE* fileBWDecode);
+
 
 //MoveToFront.c
 int seekChar(unsigned char array[], int size, unsigned char c);

@@ -32,6 +32,14 @@
 
 #define N_ASCII 256
 
+
+/**
+ * \def BUFFER_SIZE Constant correponding to the size of the buffer read from a file or written into it
+ */
+
+#define BUFFER_SIZE 8000
+
+
 /**
  * \def FCLOSE(X) Macro used to check if a file was closed correctly, if not then the program is stopped
  */
