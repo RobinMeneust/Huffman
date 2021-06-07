@@ -3,12 +3,9 @@ SDL ?
 Use larger buffers when writting in files
 
 Manage errors
-<<<<<<< HEAD
 
 Improve BW decode (don't use matrix)
-=======
-If indexBW=-1 in table is it well detected/gotten by the decompress function ?
->>>>>>> e62eafd8a27daec77315c37f0e17fe99fefca998
+
 
 _______________________________
 Tree saving method:
