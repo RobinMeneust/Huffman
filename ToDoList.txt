@@ -4,8 +4,6 @@ Use larger buffers when writting in files ?
 
 Manage errors
 If indexBW=-1 in table is it well detected/gotten by the decompress function ?
-MTF useful ?
-
 
 _______________________________
 Tree saving method:
