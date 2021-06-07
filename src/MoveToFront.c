@@ -62,6 +62,7 @@ void shiftCharStart(unsigned char tab[],int size, int index)
 
 void moveToFrontEncode(FileBuffer *buffer)
 {
+    int progress=0;
     int index;
     unsigned char tabAscii[N_ASCII];
     for(int i=0; i<N_ASCII; i++){   // int and not unsigned char because in the latter case i would never exceeds N_ASCII-1, so it would be an infinite loop
@@ -71,6 +72,12 @@ void moveToFrontEncode(FileBuffer *buffer)
         index = seekChar(tabAscii, N_ASCII, buffer->text[i]);
         buffer->text[i]=index;
         shiftCharStart(tabAscii, N_ASCII, index);
+
+        if(progress+5 < 100*(((double)i)/buffer->size))
+        {
+            progress+=5; 
+            printf("%d%%\n", progress); //Displays the progress of the current task
+        }
     }
 }
 
@@ -82,6 +89,7 @@ void moveToFrontEncode(FileBuffer *buffer)
 
 void moveToFrontDecode(FileBuffer *buffer)
 {
+    int progress=0;
     unsigned char c=0;
     unsigned char tabAscii[N_ASCII];
     for(int i=0; i<N_ASCII; i++){
@@ -92,5 +100,11 @@ void moveToFrontDecode(FileBuffer *buffer)
         c=tabAscii[buffer->text[i]];
         shiftCharStart(tabAscii, N_ASCII, buffer->text[i]);
         buffer->text[i]=c;
+
+        if(progress+5 < 100*(((double)i)/buffer->size))
+        {
+            progress+=5; 
+            printf("%d%%\n", progress); //Displays the progress of the current task
+        }
     }
 }
