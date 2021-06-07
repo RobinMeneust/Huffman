@@ -317,7 +317,7 @@ void readNodeHuffmanAndWrite(FileBuffer* bufferChar, FileBuffer* bufferPos, Huff
             *filling=0;
             //printf(" ");
 
-            if((*posBufferPos)==bufferPos->size-2){ // the buffer is full so we increase its size
+            if((*posBufferPos)>bufferPos->size-5){ // the buffer is full so we increase its size
                 bufferPos->size+=1000;
                 bufferPos->text = (unsigned char*) realloc(bufferPos->text, sizeof(unsigned char)*bufferPos->size);
                 TESTALLOC(bufferPos->text);
@@ -337,7 +337,7 @@ void readNodeHuffmanAndWrite(FileBuffer* bufferChar, FileBuffer* bufferPos, Huff
             //printf("\nBUFFER_INS %d|%c\n", *buffer, *buffer);
             *filling=0;
             
-            if((*posBufferPos)==bufferPos->size-2){ // the buffer is full so we increase its size
+            if((*posBufferPos)>bufferPos->size-5){ // the buffer is full so we increase its size
                 bufferPos->size+=1000;
                 bufferPos->text = (unsigned char*) realloc(bufferPos->text, sizeof(unsigned char)*bufferPos->size);
                 TESTALLOC(bufferPos->text);
@@ -357,7 +357,7 @@ void readNodeHuffmanAndWrite(FileBuffer* bufferChar, FileBuffer* bufferPos, Huff
             //printf("\nBUFFER_INS %d|%c\n", *buffer, *buffer);
             *filling=0;
 
-            if((*posBufferPos)==bufferPos->size-2){ // the buffer is full so we increase its size
+            if((*posBufferPos)>bufferPos->size-5){ // the buffer is full so we increase its size
                 bufferPos->size+=1000;
                 bufferPos->text = (unsigned char*) realloc(bufferPos->text, sizeof(unsigned char)*bufferPos->size);
                 TESTALLOC(bufferPos->text);
@@ -376,7 +376,7 @@ void readNodeHuffmanAndWrite(FileBuffer* bufferChar, FileBuffer* bufferPos, Huff
             //printf("\nBUFFER_INS %d|%c\n", *buffer, *buffer);
             *filling=0;
 
-            if((*posBufferPos)==bufferPos->size-2){ // the buffer is full so we increase its size
+            if((*posBufferPos)>bufferPos->size-5){ // the buffer is full so we increase its size
                 bufferPos->size+=1000;
                 bufferPos->text = (unsigned char*) realloc(bufferPos->text, sizeof(unsigned char)*bufferPos->size);
                 TESTALLOC(bufferPos->text);
@@ -470,7 +470,7 @@ FileBuffer saveTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
             pos++;
             l = l->next;
 
-            if(pos==bufferTable.size-2){ // the buffer is full so we increase its size
+            if(pos>bufferTable.size-5){ // the buffer is full so we increase its size
                 bufferTable.size+=1000;
                 bufferTable.text = (unsigned char*) realloc(bufferTable.text, sizeof(unsigned char)*bufferTable.size);
                 TESTALLOC(bufferTable.text);
