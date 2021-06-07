@@ -140,7 +140,7 @@ void compressMain(char* fileNameIn)
 
 
 
-    if(sizeFileIn<1000)
+    if(sizeFileIn<30000)
     {
         //BURROWS WHEELER
         printf("\nBurrows Wheeler...\n");

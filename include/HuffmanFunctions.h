@@ -54,14 +54,8 @@ void decompressMain();
 
 
 //BurrowsWheeler.c
-unsigned char ** allocateMatBW(long size);
-void freeMatBW(unsigned char** matBW, long size);
-void shiftedFilling(FILE* fileIn, unsigned char** matBW, long size, long position);
-long sortMat(unsigned char** matBW, long size);
-void saveBWEncode(FILE* fileBW, unsigned char** matBW, long size, long i0);
-void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, long shift);
-void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0);
 void rotationSort(unsigned char* tabChar,int* indexes, int size);
+void bubbleSortIndexes(unsigned char* tabChar, int* indexes, int size);
 int burrowsWheeler(FileBuffer* bufferIn);
 void burrowsWheelerDecode(int indexBW, FileBuffer bufferIn, FILE* fileBWDecode);
 

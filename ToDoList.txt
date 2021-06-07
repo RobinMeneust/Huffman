@@ -4,7 +4,7 @@ Use larger buffers when writting in files
 
 Manage errors
 
-Improve BW decode (don't use matrix)
+Improve BW encode ?
 
 
 _______________________________

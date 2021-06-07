@@ -7,181 +7,6 @@
 
 #include "../include/Structures_Define.h"
 #include "../include/HuffmanFunctions.h"
-/**
- * \fn unsigned char ** allocateMatBW(long size)
- * \brief Allocates the square matrix of characters given with its size
- * \param size size of the matBW matrix
- * \return Allocated matrix
- */
-
-unsigned char ** allocateMatBW(long size)
-{
-    unsigned char** mat_return = NULL;
-    mat_return = malloc(size*sizeof(unsigned char*));
-    TESTALLOC(mat_return);
-    for(long i=0; i<size; i++){
-        mat_return[i] = malloc(size*sizeof(unsigned char));
-        TESTALLOC(mat_return[i]);
-    }
-    return mat_return;
-}
-
-/**
- * \fn void freeMatBW(unsigned char** matBW, long size)
- * \brief Frees the given square matrix of characters
- * \param matBW Matrix that we have to free
- * \param size Size of the given matrix
- */
-
-void freeMatBW(unsigned char** matBW, long size)
-{
-    for(long i=0; i<size; i++){
-        free(matBW[i]);
-    }
-    free(matBW);
-}
-
-
-
-/**
- * \fn void shiftedFilling(FILE* fileIn, unsigned char** mat, long size, int position)
- * \brief Fills a line of the matrix matBW with all the content of the initial file, it begins with the character at the index "position" and coontinues until all the content as been enter. If we get to the end of the file without filling all the line then we go back to the beginning of the file
- * \param fileIn Initial file that we have to compress
- * \param mat Sorted matrix that we fill
- * \param size Size of matBW
- * \param position Line filled here. Also corresponds to the right shift compared to the initial line (the first one in this matrix)
- */
-
-void shiftedFilling(FILE* fileIn, unsigned char** mat, long size, long position)
-{
-    unsigned char c;
-    long i=position;
-    rewind(fileIn);
-    c = fgetc(fileIn);
-    while(!feof(fileIn)){
-        mat[position][i] = c;
-        i++;
-        if(i==size){
-            i=0;
-        }
-        c=fgetc(fileIn);
-    }
-    rewind(fileIn);
-}
-
-/**
- * \fn long sortMat(char** mat, long size)
- * \brief Sorts by ascending value each line of the matrix mat, it considers only the first character of each line, and if those 2 characters are equal then we use the next ones to sort the matrix
- * \param mat Matrix that we are sorting
- * \param size Size of the given matrix
- * \return Index of the line of the sorted matrix that corresponds to the initial text (used only for compression in older versions of this project)
- */
-
-long sortMat(unsigned char** mat, long size)
-{
-    long i0=0;
-    long j=0;
-    long k=0;
-    int repeat;
-    unsigned char* temp = NULL;
-    for(long i=1; i<size; i++){
-        j=i-1;
-        temp = mat[i];
-        repeat=1;
-        while(j>=0 && repeat && temp[0] <= mat[j][0]){
-            if(temp[0] == mat[j][0]){   // si les 2 premieres lettres des lines comparees sont identiques
-                k=0;
-                while(k<size && temp[k] == mat[j][k]){    // on cherche la 1re lettre differente entre les 2 lines
-                    k++;
-                }
-                if(k<size){   // Si les 2 sont differents
-                    if(temp[k]<mat[j][k]){ // Si le text de la line j est encore plus "grand" que celui de la line i (a inserer) par ordre alphabetique
-                        mat[j+1] = mat[j];
-                        if(j==i0){
-                            i0++;
-                        }
-                        j--;
-                    }
-                    else{
-                        repeat = 0;
-                    }
-                }
-                else{
-                    repeat=0;
-                }
-            }
-            else{
-                mat[j+1] = mat[j];
-                if(j==i0){
-                    i0++;
-                }
-                j--;
-            }
-        }
-        mat[j+1] = temp;
-    }
-    return i0;
-}
-
-
-
-/**
- * \fn void saveBWEncode(FILE* fileBW, unsigned char** matBW, long size, long i0)
- * \brief Saves the last column of matWB in the file fileBW
- * \param fileBW File that will contain the result of the application of Burrows Wheeler on the initial file
- * \param matBW Sorted square matrix containing in its last column the text that is being saved in fileBW
- * \param size Size of the matrix matBW
- * \param i0 Index written at the beginning of the string, corresponds to the line of matBW containing the content of the initial file
- */
-
-void saveBWEncode(FILE* fileBW, unsigned char** matBW, long size, long i0)
-{
-    fprintf(fileBW, "%ld\n", i0);
-    for(int i=0; i<size; i++){
-        fputc(matBW[i][size-1], fileBW);
-    }
-}
-
-
-/**
- * \fn void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, long shift)
- * \brief Shifts all columns of a cell to the right and fills the first one with le content of fileBW vertically
- * \param bufferBW Buffer filled int this function
- * \param matBW Sorted square matrix that will be used to decode Burrows Wheeler
- * \param size Size of matBW
- * \param shift Gives the number of column shifts that has to be done (between 0 and size-1)
- */
-
-void fillColumnBWDecode(FileBuffer bufferBW, unsigned char** matBW, long size, long shift)
-{
-    int pos=0;
-    for(long i=0; i<size; i++){
-        for(int j=shift; j>0; j--){
-            matBW[i][j]=matBW[i][j-1];
-        }
-        matBW[i][0]=bufferBW.text[pos];
-        pos++;
-    }
-}
-
-
-
-/**
- * \fn void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
- * \brief Saves in a file the text obtained after applying the inverse of Burrows Wheeler (decode)
- * \param fileBWDecode File filled by this function, it's the content of the initial file before applying Burrows Wheeler
- * \param matBW Sorted square matrix containing in its last coluln the text saved here
- * \param size Size of the matrix matBW
- * \param i0 Index written at the beginning of the string, corresponds to the line of matBW containing the content of the initial file
- */
-
-void saveBWDecode(FILE* fileBWDecode, unsigned char** matBW, long size, long i0)
-{
-    for(int i=0; i<size; i++){
-        fputc(matBW[i0][i], fileBWDecode);
-    }
-    printf("\n");
-}
 
 
 /**
@@ -224,6 +49,36 @@ void rotationSort(unsigned char* tabChar, int* indexes, int size)
 
 
 /**
+ * \fn bubbleSortIndexes(unsigned char* tabChar, int* indexes, int size)
+ * \brief Sorts the array of indexes by using a bubble sort
+ * \param tabChar Array containing a string whose cells will be sorted in the array indexes by this function
+ * \param indexes Array of the tabChar indexes
+ * \param size Size of the arrays tabChar and indexes
+ */
+
+void bubbleSortIndexes(unsigned char* tabChar, int* indexes, int size)
+{
+    int progress=0;
+    int i=size-1;
+    int temp=0;
+    int messy=0;
+
+    do{
+        messy = 0;
+        for (int j=0; j<i; j++){
+            if(tabChar[indexes[j]]>tabChar[indexes[j+1]]){
+                messy = 1;
+                temp = indexes[j];
+                indexes[j] = indexes[j+1];
+                indexes[j+1] = temp;
+            }
+        }
+        i--;
+    }while(messy && i>0);
+}
+
+
+/**
  * \fn int burrowsWheeler(FileBuffer* bufferIn)
  * \brief Applies Burrows Wheeler to bufferIn
  * \param bufferIn Buffer on which is applied Burrows Wheeler
@@ -253,12 +108,12 @@ int burrowsWheeler(FileBuffer* bufferIn)
         i++;
     }
 
-    for(int i=0; i<size; i++)
+    for(int j=0; j<size; j++)
     {
-        int id = indexes[i]-1;
+        int id = indexes[j]-1;
         if(id==-1)
             id=size-1;
-        bufferIn->text[i]=tabChar[id];
+        bufferIn->text[j]=tabChar[id];
     }
     free(tabChar);
     free(indexes);
@@ -276,14 +131,28 @@ int burrowsWheeler(FileBuffer* bufferIn)
 
 void burrowsWheelerDecode(int indexBW, FileBuffer bufferIn, FILE* fileBWDecode)
 {
-    long size = bufferIn.size;
     int progress=0;
-    unsigned char ** matBW = allocateMatBW(size);
-    for(long i=0; i<size; i++){
-        fillColumnBWDecode(bufferIn, matBW, size, i);
-        sortMat(matBW, size);
+    int* indexes= (int*) malloc(sizeof(int*)*bufferIn.size); // Will contained sorted indexes
+    int i=0;
+    int nbW=0; // Number of written characters
 
-        if(progress+5 < 100*(((double)i)/size))
+    for(int i=0; i<bufferIn.size; i++)
+    {
+        indexes[i]=i;
+    }
+
+    printf("\nSorting indexes for Burrows Wheeler...\n");
+    bubbleSortIndexes(bufferIn.text, indexes, bufferIn.size);
+    
+    rewind(fileBWDecode);
+    i = indexes[indexBW];
+    printf("\nThe output file is being filled...\n");
+    while(nbW<bufferIn.size){
+        fputc(bufferIn.text[i], fileBWDecode);
+        i=indexes[i];
+        nbW++;
+
+        if(progress+5 < 100*(((double)nbW)/bufferIn.size))
         {
             progress+=5; 
             printf("%d%%\n", progress); //Displays the progress of the current task
@@ -291,7 +160,5 @@ void burrowsWheelerDecode(int indexBW, FileBuffer bufferIn, FILE* fileBWDecode)
 
     }
 
-    rewind(fileBWDecode);
-    saveBWDecode(fileBWDecode, matBW, size, indexBW);
-    freeMatBW(matBW, size);
+    free(indexes);
 }
