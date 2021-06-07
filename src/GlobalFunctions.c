@@ -19,7 +19,7 @@
 void getFileName(char * fileName)
 {
     char* posEndInput = NULL;
-    printf("\nFull name of the file that has to be compressed/decompressed (whith its extension if it has one) : ");
+    printf("\nFull name of the file that has to be compressed/decompressed (with its extension if it has one) : ");
     if(fgets(fileName, FILENAME_MAX, stdin)==NULL){
         fprintf(stderr, "ERROR : Issue encountered while getting the name of the file");
         exit(EXIT_FAILURE);

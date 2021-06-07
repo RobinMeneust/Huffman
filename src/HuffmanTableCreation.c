@@ -455,7 +455,6 @@ HuffmanTableCell* createHuffmanTable(int indexBW, FileBuffer bufferIn, int* size
         merge(i_min1, i_min2, occurrencesArray, &sizeOccurrencesArray);
     }
     printf("\nSaving table and tree...\n");
-
     saveTree(indexBW, occurrencesArray[i_min1].mergedHead, *sizeHuffmanTable, bufferIn.size);
     freeHuffmanTree(occurrencesArray[i_min1].mergedHead);
     freeOccurrencesArray(occurrencesArray, sizeOccurrencesArray);

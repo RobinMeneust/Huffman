@@ -185,10 +185,11 @@ void decompress(FILE* fileIn, FileBuffer* bufferOut, HuffmanTreePtr huffmanTreeH
             }
             sizeBuffer--;
         }
-        if(progress+5<((posBuffOut+1)*100)/sizeFileIn)
+
+        if(progress+5 < 100*(((double)posBuffOut)/sizeFileIn))
         {
-            progress=(int)((((posBuffOut+1)*100)/sizeFileIn)/5)*5; //Display the progress of the current task
-            printf("%d%%\n", progress);
+            progress+=5; 
+            printf("%d%%\n", progress); //Displays the progress of the current task
         }
 
         buffer=fgetc(fileIn);
@@ -283,6 +284,7 @@ void decompressMain(char* fileNameIn)
     }
     else
     {
+        printf("\nThe output file is being filled...\n");
         bufferToFile(bufferText, fileOut);
     }
 

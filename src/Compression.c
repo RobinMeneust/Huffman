@@ -32,9 +32,6 @@ void freeHuffmanTable(HuffmanTableCell* huffmanTable, int sizeHuffmanTable)
 
 
 
-
-
-
 /**
  * \fn void compress(FileBuffer bufferBW, FILE* fileOut, FileBuffer bufferTable)
  * \brief Compresses bufferBW by using the Huffman table
@@ -57,7 +54,6 @@ void compress(FileBuffer bufferBW, FILE* fileOut, HuffmanTableCell* huffmanTable
     int posIn=0;
     int posTable=0;
     PtrlistCode l=NULL;
-
     while(posIn<bufferBW.size){
         c = bufferBW.text[posIn];
         c_table = huffmanTable[posTable].c;
@@ -65,21 +61,18 @@ void compress(FileBuffer bufferBW, FILE* fileOut, HuffmanTableCell* huffmanTable
             posTable++;
             c_table = huffmanTable[posTable].c;
         }
-
         if(c_table!=c){
             printf("ERROR : Character not found in the table : %c|%d", c, c);
             exit(EXIT_FAILURE);
         }
 
         l = huffmanTable[posTable].code;
-
         while(l!=NULL){
             switch(l->value){
                 case '0': buffer <<= 1; break;  //We shift bits to the left, then we add the bit (0 here) to the right
                 case '1': buffer <<= 1; buffer|=0b1; break; //We shift bits to the left, then we add the bit (1 here) to the right, we use a mask to do so
                 default : fprintf(stderr, "\nERROR : Binary code not found in table\n"); exit(EXIT_FAILURE);
             }
-
             filling++;
             if(filling==8){ //The buffer is filled, we can insert it in bufferOut
                 bufferOut.text[bufferOut.size]=buffer;
@@ -98,10 +91,10 @@ void compress(FileBuffer bufferBW, FILE* fileOut, HuffmanTableCell* huffmanTable
         posIn++;
         posTable=0;
 
-        if(progress+5<((posIn+1)*100)/bufferBW.size)
+        if(progress+5 < 100*(((double)posIn)/bufferBW.size))
         {
-            progress=(int)((((posIn+1)*100)/bufferBW.size)/5)*5; //Display the progress of the current task
-            printf("%d%%\n", progress);
+            progress+=5; 
+            printf("%d%%\n", progress); //Displays the progress of the current task
         }
     }
 
@@ -115,7 +108,6 @@ void compress(FileBuffer bufferBW, FILE* fileOut, HuffmanTableCell* huffmanTable
         buffer=0;
         filling=0;
     }
-
     if(bufferOut.size>0){ // The buffer isn't empty
         fwrite(bufferOut.text, sizeof(unsigned char), bufferOut.size, fileOut);
         bufferOut.size=0;
