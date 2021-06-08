@@ -49,7 +49,7 @@ void bufferToFile(FileBuffer buffer, FILE* file)
 
 
 /**
- * \fn FileBuffer getPortionOfFileToBuffer(FILE* fileTable, int sizeBuff)
+ * \fn FileBuffer getPortionOfFileToBuffer(FILE* file, int sizeBuff)
  * \brief Reads a file without starting at the beginning and continue until it has read a certain amount (sizeBuff) of characters. Then it save it in a buffer that is returned
  * \param file File from which we get the buffer
  * \param sizeBuff Size of the return buffer. Number of characters read from the file
